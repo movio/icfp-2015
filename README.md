@@ -1,3 +1,4 @@
+```scala
 // load problem i: Int from http://icfpcontest.org/problems.html
 val p: Problem = Problems.load(i)
 
@@ -7,3 +8,4 @@ p.getSource(i)
 // display grid
 val s = new Simulator(problem, seedIndex)
 Pretty.print(s.board)
+```
