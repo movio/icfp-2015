@@ -1,8 +1,8 @@
-class Board(width: Int, height: Int) {
+object Pretty {
+  def draw(map: Array[Array[Boolean]]): Unit = {
+    val width = map.length
+    val height = map(0).length
 
-  val map: Array[Array[Boolean]] = Array.ofDim[Boolean](width, height)
-
-  def draw(): Unit = {
     def drawEvenRow(y: Int): Unit = {
       print("/")
       print(" V" * (width - 1))
