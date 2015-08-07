@@ -7,5 +7,6 @@ p.getSource(i)
 
 // display grid
 val s = new Simulator(problem, seedIndex)
-Pretty.print(s.board)
+s.spawn() // spawns next piece
+s.draw()
 ```
