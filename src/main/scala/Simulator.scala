@@ -41,6 +41,53 @@ object Simulator {
       point.x < 0 || point.x >= board.length || point.y < 0 || point.y >= board(0).length || board(point.x)(point.y)
     }
   }
+
+  def draw(board: Array[Array[Boolean]], current: Block = null): Unit = {
+    val width = board.length
+    val height = board(0).length
+
+    def char(x: Int, y: Int): String =
+      if (board(x)(y)) "#"
+      else if (current != null) {
+        if (current.members contains (Point(x, y))) {
+          if (current.pivot.x == x && current.pivot.y == y) "0"
+          else "O"
+        }
+        else if (current.pivot.x == x && current.pivot.y == y) "X"
+        else " "
+      }
+      else " "
+
+    def drawEvenRow(y: Int): Unit = {
+      print("/")
+      print(" V" * (width - 1))
+      if (y == 0) print(" \\") else print(" V")
+      println()
+
+      for (x ← 0 until width) {
+        print("|" + char(x, y))
+      }
+      println("|")
+    }
+
+    def drawOddRow(y: Int): Unit = {
+      print(" V" * width)
+      println(" \\")
+
+      print(" ")
+      for (x ← 0 until width) {
+        print("|" + char(x, y))
+      }
+      println("|")
+    }
+
+    for (y ← 0 until height) {
+      if (y % 2 == 0) drawEvenRow(y)
+      else drawOddRow(y)
+    }
+    if (height % 2 == 0) print(" ")
+    println(" V" * width)
+  }
 }
 
 class Simulator(p: Problem, seedIndex: Int) {
@@ -186,50 +233,8 @@ class Simulator(p: Problem, seedIndex: Int) {
   }
 
   def draw(): Simulator = {
-    val width = p.width
-    val height = p.height
 
-    def char(x: Int, y: Int): String =
-      if (board(x)(y)) "#"
-      else if (current != null) {
-        if (current.members contains (Point(x, y))) {
-          if (current.pivot.x == x && current.pivot.y == y) "0"
-          else "O"
-        }
-        else if (current.pivot.x == x && current.pivot.y == y) "X"
-        else " "
-      }
-      else " "
-
-    def drawEvenRow(y: Int): Unit = {
-      print("/")
-      print(" V" * (width - 1))
-      if (y == 0) print(" \\") else print(" V")
-      println()
-
-      for (x ← 0 until width) {
-        print("|" + char(x, y))
-      }
-      println("|")
-    }
-
-    def drawOddRow(y: Int): Unit = {
-      print(" V" * width)
-      println(" \\")
-
-      print(" ")
-      for (x ← 0 until width) {
-        print("|" + char(x, y))
-      }
-      println("|")
-    }
-
-    for (y ← 0 until height) {
-      if (y % 2 == 0) drawEvenRow(y)
-      else drawOddRow(y)
-    }
-    if (height % 2 == 0) print(" ")
-    println(" V" * width)
+    Simulator.draw(board, current)
 
     println(s"Score: $totalScore")
     println()
