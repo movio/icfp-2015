@@ -1,5 +1,4 @@
 import java.io._
-import collection.mutable
 import spray.json._
 
 object Point {
@@ -99,8 +98,30 @@ case class Block(
     members: Set[Point],
     pivot: Point) {
 
-  def move(move: Move): Block =
-    Block(members map (p ⇒ p.move(move, pivot)), pivot.move(move, pivot))
+  def move(move: Move, times: Int = 1): Block =
+    if (times <= 0)
+      this
+    else
+      Block(members map (p ⇒ p.move(move, pivot)), pivot.move(move, pivot)).move(move, times - 1)
+
+  def isInsideBoard(boardWidth: Int, boardHeight: Int): Boolean =
+    members.forall(p => p.x < boardWidth && p.x >= 0 && p.y < boardHeight && p.y >= 0)
+
+  def permutations(boardWidth: Int, boardHeight: Int): Set[Block] = {
+    val blocks: IndexedSeq[Block] = for {
+      x <- -boardWidth until boardWidth
+      y <- -boardHeight until boardHeight
+      r <- 0 to 5
+    } yield copy().addX(x).addY(y).move(Clock, r)
+    val setOfBlocks: Set[Block] = blocks.filter(_.isInsideBoard(boardWidth, boardHeight)).toSet
+    setOfBlocks.groupBy(_.members).map(_._2.head).toSet // ignore pivot in comparison
+  }
+
+  def addX(delta: Int): Block =
+    copy(members map (p => p.copy(x = p.x + delta)), pivot.copy(x = pivot.x + delta))
+
+  def addY(delta: Int): Block =
+    copy(members map (p => p.copy(y = p.y + delta)), pivot.copy(y = pivot.y + delta))
 
 }
 
