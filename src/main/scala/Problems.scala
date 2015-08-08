@@ -7,35 +7,32 @@ object Point {
   implicit val jf1 = jsonFormat2(Point.apply)
 }
 case class Point(
-  x: Int,
-  y: Int)
+    x: Int,
+    y: Int) {
+  def move(move: Move): Point = {
+    move match {
+      case East ⇒ east()
+      case West ⇒ west()
+      case SouthEast ⇒ south().move(East)
+      case SouthWest ⇒ south().move(West)
+    }
+  }
+
+  private def east(): Point = copy(x = this.x + 1)
+  private def west(): Point = copy(x = this.x - 1)
+  private def south(): Point = copy(y = this.y + 1)
+}
 
 object Block {
   import DefaultJsonProtocol._
   implicit val jf2 = jsonFormat2(Block.apply)
 }
 case class Block(
-  members: Set[Point],
-  pivot: Point) {
+    members: Set[Point],
+    pivot: Point) {
 
-  def move(move: Move): Block = {
-    move match {
-      case East ⇒ east()
-      case West ⇒ west()
-    }
-  }
-
-  private def east(): Block = {
-    val newMembers = members map (p ⇒ p.copy(x = p.x + 1))
-    val newPivot = pivot.copy(x = pivot.x + 1)
-    Block(newMembers, newPivot)
-  }
-
-  private def west(): Block = {
-    val newMembers = members map (p ⇒ p.copy(x = p.x - 1))
-    val newPivot = pivot.copy(x = pivot.x - 1)
-    Block(newMembers, newPivot)
-  }
+  def move(move: Move): Block =
+    Block(members map (p ⇒ p.move(move)), pivot.move(move))
 
 }
 
@@ -52,13 +49,13 @@ object Problem {
     "sourceSeeds")
 }
 case class Problem(
-  id: Int,
-  units: Array[Block],
-  width: Int,
-  height: Int,
-  filled: Set[Point],
-  sourceLength: Int,
-  sourceSeeds: Array[Int]) {
+    id: Int,
+    units: Array[Block],
+    width: Int,
+    height: Int,
+    filled: Set[Point],
+    sourceLength: Int,
+    sourceSeeds: Array[Int]) {
 
   val sources = mutable.Map.empty[Int, Source]
 
