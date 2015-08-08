@@ -102,5 +102,58 @@ class FitnessTests extends FunSpec with ShouldMatchers {
     }
   }
 
+  describe("HoleFitness") {
+    describe("gives the negated number of spaces covered by blocks") {
+      it("counts empty boards as zero") {
+        val board = Array(Array(false, false, false))
+        val f = new HoleFitness(1)
+        f.apply(board) shouldBe 0
+      }
 
+      it("counts filled boards as zero") {
+        val board = Array(Array(true,true,true))
+        val f = new HoleFitness(1)
+        f.apply(board) shouldBe 0
+      }
+
+      it("does not count open space") {
+        val board = Array(Array(false,false,true))
+        val f = new HoleFitness(1)
+        f.apply(board) shouldBe 0
+      }
+
+      it("counts enclosed spaces") {
+        val board = Array(Array(true,false,true))
+        val f = new HoleFitness(1)
+        f.apply(board) shouldBe -1d
+      }
+
+      it("counts each enclosed space") {
+        val board = Array(Array(true,false,false))
+        val f = new HoleFitness(1)
+        f.apply(board) shouldBe -2d
+      }
+
+      it("sums the counts of enclosed spaces in each column") {
+        val board = Array(
+          Array(true,false,false),
+          Array(false,true,false),
+          Array(false,false,true)
+        )
+        val f = new HoleFitness(1)
+        f.apply(board) shouldBe -3d
+      }
+
+      it("applies the weight") {
+        val board = Array(
+          Array(true,false,false),
+          Array(false,true,false),
+          Array(false,false,true)
+        )
+        val f = new HoleFitness(0.5)
+        f.apply(board) shouldBe -1.5d
+      }
+    }
+
+  }
 }

@@ -18,7 +18,7 @@ class CommandFitness(problem: Problem) extends FitnessFunction {
 }
 
 class AggergateDepthFitness(weight: Double) extends Function[Array[Array[Boolean]], Double] {
-  def apply(board: Array[Array[Boolean]]): Double = {
+  override def apply(board: Array[Array[Boolean]]): Double = {
     board.foldLeft(0d) { (depth, col) ⇒
       val firstIdx = col.indexOf(true)
       if (firstIdx == -1) {
@@ -31,7 +31,7 @@ class AggergateDepthFitness(weight: Double) extends Function[Array[Array[Boolean
 }
 
 class CompleteLinesFitness(weight: Double) extends Function[Array[Array[Boolean]], Double] {
-  def apply(board: Array[Array[Boolean]]): Double = {
+  override def apply(board: Array[Array[Boolean]]): Double = {
     board.transpose.foldLeft(0) { (numCleared, row) ⇒
       if (row.forall(b => b)) {
         numCleared + 1
@@ -39,5 +39,19 @@ class CompleteLinesFitness(weight: Double) extends Function[Array[Array[Boolean]
         numCleared
       }
     } * weight
+  }
+}
+
+
+class HoleFitness(weight: Double) extends Function[Array[Array[Boolean]], Double] {
+  override def apply(board: Array[Array[Boolean]]): Double = {
+    board.foldLeft(0) { (count, col) =>
+      val firstCovered = col.indexOf(true)
+      if (firstCovered >= 0) {
+        col.splitAt(firstCovered)._2.count(_ == false) + count
+      } else {
+        count
+      }
+    } * (-weight)
   }
 }
