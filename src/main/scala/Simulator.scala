@@ -9,6 +9,7 @@ case object CounterClock extends Move
 
 class Simulator(p: Problem, seedIndex: Int) {
 
+  // TODO optimise this to (y, x) - makes line clearing much easier
   val board = Array.ofDim[Boolean](p.width, p.height)
   p.filled foreach (point ⇒ board(point.x)(point.y) = true)
 
@@ -22,7 +23,6 @@ class Simulator(p: Problem, seedIndex: Int) {
   var linesClearedOld = 0
 
   private def spawn(): Simulator = {
-    if (current != null) throw new RuntimeException("current piece is still in play!!!!")
     // TODO check game end
     val next = source.next
 
@@ -48,9 +48,9 @@ class Simulator(p: Problem, seedIndex: Int) {
 
     // check for invalid move
     if (isLocationInvalid(next)) {
-      // TODO check for clear lines
-      score()
       lock()
+      clearLines()
+      score()
       spawn()
     } else {
       current = next
@@ -62,6 +62,37 @@ class Simulator(p: Problem, seedIndex: Int) {
   // TODO: check for collisions with filled cells
   private def isLocationInvalid(b: Block): Boolean =
     b.members exists (point ⇒ point.x < 0 || point.x >= p.width || point.y < 0 || point.y >= p.height)
+
+  private def clearLines(): Simulator = {
+    def isLineFull(y: Int): Boolean =
+      (0 until p.width) forall (x ⇒ board(x)(y) == true)
+
+    // the top row (y=0) is left dirty
+    def clearLine(y: Int): Unit = {
+      for {
+        y ← (0 until y).reverse
+        x ← 0 until p.width
+      } {
+        board(x)(y+1) = board(x)(y)
+      }
+    }
+
+    linesClearedOld = linesCleared
+    linesCleared = 0
+
+    (0 until p.height) foreach { y ⇒
+      if (isLineFull(y)) {
+        clearLine(y)
+        linesCleared += 1
+      }
+    }
+
+    // if we cleared any lines, the top row (y=0) needs to be reset
+    if (linesCleared > 0)
+      (0 until p.width) foreach (x ⇒ board(x)(0) = false)
+
+    this
+  }
 
   private def score(): Simulator = {
     val size = current.members.size
@@ -76,7 +107,6 @@ class Simulator(p: Problem, seedIndex: Int) {
 
   private def lock(): Simulator = {
     current.members.foreach (point ⇒ board(point.x)(point.y) = true)
-    current = null
     this
   }
 
