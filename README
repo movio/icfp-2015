@@ -1,9 +1,11 @@
 Greeting Great Old Ones!
 
 to build our solution you will need:
- - java7
- - scala 2.11
- - sbt
+ - java 1.7.x        (check with `java -version`)
+ - scala 2.11.x      (check with `scala -version`)
+ - sbt 0.13.x        (check with `sbt --version`)
+
+Note: sbt will require internet access to download dependencies
 
 how to compile: 
  $ make
