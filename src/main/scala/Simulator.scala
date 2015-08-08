@@ -36,7 +36,6 @@ class Simulator(p: Problem, seedIndex: Int) {
   var isGameOver = false
 
   private def spawn(): Simulator = {
-    // TODO check game end
     val next = source.next
 
     if (next != null) {
@@ -78,7 +77,6 @@ class Simulator(p: Problem, seedIndex: Int) {
       // error to repeat position
       if (history.contains(next)) {
         totalScore = 0
-        println("REPEAT POSITION")
         gameOver()
       }
 
