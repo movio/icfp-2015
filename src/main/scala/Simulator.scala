@@ -2,7 +2,7 @@ import collection.mutable
 
 sealed abstract class Move(val s:String)
 object Move {
-  val all = Seq(East, West, SouthEast, SouthWest, Clock, CounterClock)
+  val all = Seq(SouthEast, SouthWest, East, West, Clock, CounterClock)
   def fromName(s: String): Move =
     all.find(_.s == s).get
 }
@@ -29,9 +29,11 @@ object Simulator {
     val xoffset = left - xmin
     val yoffset = -ymin
 
+    val offset = Point(xoffset, yoffset)
+
     Block(
-      block.members map (p ⇒ Point(p.x + xoffset, p.y + yoffset)),
-      Point(block.pivot.x + xoffset, block.pivot.y + yoffset))
+      block.members map (p ⇒ p.untranslate(offset)),
+      block.pivot.untranslate(offset))
   }
 
   def isLocationInvalid(block: Block, board: Array[Array[Boolean]]): Boolean = {
@@ -110,6 +112,9 @@ class Simulator(p: Problem, seedIndex: Int) {
 
     this
   }
+
+  def validCurrentPermutations(): Set[Block] =
+    current.permutations(p.width, p.height).filterNot(isLocationInvalid(_, board))
 
   def playAll(s: String): Simulator = {
     val moves = s map (c ⇒ Move.fromName(c.toString))
