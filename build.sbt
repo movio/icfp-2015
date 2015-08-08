@@ -1,5 +1,7 @@
 scalaVersion := "2.11.6"
 
+name := "icfp2015-movio"
+
 resolvers += "spray repo" at "http://repo.spray.io"
 
 libraryDependencies ++= Seq(
