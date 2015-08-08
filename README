@@ -1,0 +1,19 @@
+Greeting Great Old Ones!
+
+to build our solution you will need:
+ - java7
+ - scala 2.11
+ - sbt
+
+how to compile: 
+ $ make
+
+how to run:
+ $ ./play_icfp2015 [ARGS]
+
+
+
+
+Cheers from down under,
+
+the Movio Team
