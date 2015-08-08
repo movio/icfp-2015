@@ -18,6 +18,9 @@ class Simulator(p: Problem, seedIndex: Int) {
 
   var totalScore = 0
 
+  var linesCleared = 0
+  var linesClearedOld = 0
+
   private def spawn(): Simulator = {
     if (current != null) throw new RuntimeException("current piece is still in play!!!!")
     // TODO check game end
@@ -45,9 +48,9 @@ class Simulator(p: Problem, seedIndex: Int) {
 
     // check for invalid move
     if (isLocationInvalid(next)) {
+      // TODO check for clear lines
       score()
       lock()
-      // TODO check for clear lines
       spawn()
     } else {
       current = next
@@ -61,6 +64,13 @@ class Simulator(p: Problem, seedIndex: Int) {
     b.members exists (point ⇒ point.x < 0 || point.x >= p.width || point.y < 0 || point.y >= p.height)
 
   private def score(): Simulator = {
+    val size = current.members.size
+    val points = size + (100 * (1 + linesCleared) * linesCleared / 2)
+    val lineBonus = if (linesClearedOld > 1) (linesClearedOld - 1) * points / 10 else 0
+    totalScore += points + lineBonus
+
+    // TODO power bonus
+
     this
   }
 
