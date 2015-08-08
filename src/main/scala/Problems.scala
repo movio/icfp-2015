@@ -9,7 +9,7 @@ object Point {
 case class Point(
     x: Int,
     y: Int) {
-  def move(move: Move, pivot: Point): Point = {
+  def move(move: Move, pivot: Point = Point(0,0)): Point = {
     move match {
       case East ⇒ east()
       case West ⇒ west()
@@ -31,10 +31,10 @@ case class Point(
   }
 
   def translate(pivot: Point): Point =
-    Point(x - pivot.x, y - (pivot.y - (pivot.y & 1)))
+    toCubePoint().translate(pivot.toCubePoint()).toPoint()
 
   def untranslate(pivot: Point): Point =
-    Point(x + pivot.x, y + (pivot.y - (pivot.y & 1)))
+    toCubePoint().untranslate(pivot.toCubePoint()).toPoint()
 
   def toCubePoint(): CubePoint = {
     val cubeX = x - (y - (y & 1)) / 2
@@ -62,6 +62,12 @@ case class CubePoint(x: Int, y: Int, z: Int) {
       case CounterClock ⇒ CubePoint(-y, -z, -x)
     }
   }
+
+  def translate(pivot: CubePoint): CubePoint =
+    CubePoint(x - pivot.x, y - pivot.y, z - pivot.z)
+
+  def untranslate(pivot: CubePoint): CubePoint =
+    CubePoint(x + pivot.x, y + pivot.y, z + pivot.z)
 
 }
 
