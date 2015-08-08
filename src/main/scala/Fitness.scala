@@ -44,7 +44,6 @@ class CompleteLinesFitness(weight: Double) extends Function[Array[Array[Boolean]
   }
 }
 
-
 class HoleFitness(weight: Double) extends Function[Array[Array[Boolean]], Double] {
   override def apply(board: Array[Array[Boolean]]): Double = {
     board.foldLeft(0) { (count, col) =>
@@ -77,6 +76,14 @@ class BumpinessFintness(weight: Double) extends Function[Array[Array[Boolean]], 
     } else {
       idx
     }
+  }
+}
+
+class LineFullnessFitness(weight: Double) extends Function[Array[Array[Boolean]], Double] {
+  override def apply(board: Array[Array[Boolean]]): Double = {
+    board.transpose.foldLeft(0) { (numCleared, row) ⇒
+      row.count(b => b) + numCleared
+    } * weight
   }
 }
 

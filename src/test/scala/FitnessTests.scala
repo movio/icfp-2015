@@ -211,4 +211,46 @@ class FitnessTests extends FunSpec with ShouldMatchers {
       }
     }
   }
+
+  describe("LineFullnessFitness") {
+    describe("gives points for the number of filled cells in a row") {
+      it("counts the true values on a single row") {
+        val board = Array(Array(false), Array(false), Array(true))
+        val f = new LineFullnessFitness(1)
+        f.apply(board) shouldBe 1d
+      }
+
+      it("counts the true values on a single row if there is more than one") {
+        val board1 = Array(Array(true), Array(false), Array(true))
+        val f = new LineFullnessFitness(1)
+        f.apply(board1) shouldBe 2d
+
+        val board2 = Array(Array(false), Array(true), Array(true))
+        f.apply(board2) shouldBe 2d
+      }
+
+      it("adds up the fullness of each row") {
+        val board1 = Array(
+          Array(true, true),
+          Array(false, true),
+          Array(true, false)
+        )
+
+        val f = new LineFullnessFitness(1)
+        f.apply(board1) shouldBe 4d
+      }
+
+      it("applies the weight") {
+        val board1 = Array(
+          Array(true, true),
+          Array(false, true),
+          Array(true, false)
+        )
+
+        val f = new LineFullnessFitness(0.25)
+        f.apply(board1) shouldBe 1d
+      }
+
+    }
+  }
 }
