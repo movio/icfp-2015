@@ -48,13 +48,21 @@ class Simulator(p: Problem, seedIndex: Int) {
       val yoffset = -ymin
 
       current = Block(
-      next.members map (p ⇒ Point(p.x + xoffset, p.y + yoffset)),
-      Point(next.pivot.x + xoffset, next.pivot.y + yoffset))
+        next.members map (p ⇒ Point(p.x + xoffset, p.y + yoffset)),
+        Point(next.pivot.x + xoffset, next.pivot.y + yoffset))
+
+      if (isLocationInvalid(current))
+        gameOver()
     } else {
-      isGameOver = true
+      gameOver()
     }
 
     this
+  }
+
+  private def gameOver(): Unit = {
+    current = null
+    isGameOver = true
   }
 
   def play(move: Move): Simulator = {
@@ -73,6 +81,15 @@ class Simulator(p: Problem, seedIndex: Int) {
     }
 
     this
+  }
+
+  def playAll(s: String): Simulator = {
+    val moves = s map (c ⇒ Move.fromName(c.toString))
+    moves.foldLeft(this) { (s, move) ⇒
+      val s2 = s.play(move).draw()
+      readLine()
+      s2
+    }
   }
 
   private def isLocationInvalid(b: Block): Boolean =
@@ -172,6 +189,9 @@ class Simulator(p: Problem, seedIndex: Int) {
     }
     if (height % 2 == 0) print(" ")
     println(" V" * width)
+
+    println(s"Score: $totalScore")
+    println()
 
     if (isGameOver) println("GAME OVER")
 
