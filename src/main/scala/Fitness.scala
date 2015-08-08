@@ -16,3 +16,11 @@ class CommandFitness(problem:Problem) extends FitnessFunction {
     simulator.totalScore
   }
 }
+
+class HeightFitness(weight:Double) extends Function[Simulator,Double] {
+  def apply(simulator:Simulator):Double = {
+    simulator.board.transpose.indexWhere { row =>
+      row.contains(true)
+    } * weight
+  }
+}
