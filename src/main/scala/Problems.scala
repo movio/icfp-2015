@@ -28,6 +28,27 @@ case class Point(
     }
   }
 
+  def moveReverse(move: Move, pivot: Point = Point(0,0)): Point = {
+    move match {
+      case East ⇒ west()
+      case West ⇒ east()
+      case SouthEast ⇒
+        if (y % 2 == 0) // even
+          north().move(West, pivot)
+        else // odd
+          north()
+      case SouthWest ⇒
+        if (y % 2 == 0) // even
+          north()
+        else //odd
+          north().move(East, pivot)
+      case Clock ⇒
+        translate(pivot).toCubePoint().move(CounterClock).toPoint().untranslate(pivot)
+      case CounterClock ⇒
+        translate(pivot).toCubePoint().move(Clock).toPoint().untranslate(pivot)
+    }
+  }
+
   def translate(pivot: Point): Point =
     toCubePoint().translate(pivot.toCubePoint()).toPoint()
 
@@ -44,6 +65,7 @@ case class Point(
   private def east(): Point = copy(x = this.x + 1)
   private def west(): Point = copy(x = this.x - 1)
   private def south(): Point = copy(y = this.y + 1)
+  private def north(): Point = copy(y = this.y - 1)
 }
 
 case class CubePoint(x: Int, y: Int, z: Int) {

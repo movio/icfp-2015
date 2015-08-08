@@ -79,4 +79,45 @@ class SimulatorTest extends FunSpec with ShouldMatchers {
     Point(3, 1).move(CounterClock, Point(1, 3)) shouldBe Point(1, 0)
   }
 
+  describe("reverse") {
+    it("should move pieces East reverse correctly") {
+      Point(1, 0).moveReverse(East) shouldBe Point(0, 0)
+      Point(2, 0).moveReverse(East).moveReverse(East) shouldBe Point(0, 0)
+      Point(1, 1).moveReverse(East) shouldBe Point(0, 1)
+      Point(2, 1).moveReverse(East).moveReverse(East) shouldBe Point(0, 1)
+    }
+
+    it("should move pieces West reverse correctly") {
+      Point(0, 0).moveReverse(West) shouldBe Point(1, 0)
+      Point(-1, 0).moveReverse(West).moveReverse(West) shouldBe Point(1, 0)
+      Point(0, 1).moveReverse(West) shouldBe Point(1, 1)
+      Point(-1, 1).moveReverse(West).moveReverse(West) shouldBe Point(1, 1)
+    }
+
+    it("should move pieces SouthEast reverse correctly") {
+      Point(0, 1).moveReverse(SouthEast) shouldBe Point(0, 0)
+      Point(1, 2).moveReverse(SouthEast).moveReverse(SouthEast) shouldBe Point(0, 0)
+      Point(1, 2).moveReverse(SouthEast) shouldBe Point(0, 1)
+      Point(1, 3).moveReverse(SouthEast).moveReverse(SouthEast) shouldBe Point(0, 1)
+    }
+
+    it("should move pieces SouthWest reverse correctly") {
+      Point(0, 1).moveReverse(SouthWest) shouldBe Point(1, 0)
+      Point(0, 2).moveReverse(SouthWest).moveReverse(SouthWest) shouldBe Point(1, 0)
+      Point(1, 2).moveReverse(SouthWest) shouldBe Point(1, 1)
+      Point(0, 3).moveReverse(SouthWest).moveReverse(SouthWest) shouldBe Point(1, 1)
+    }
+
+    it("rotate big objects clockwise with an odd row pivot") {
+      Point(1, 1).moveReverse(Clock, Point(1, 3)) shouldBe Point(0, 2)
+      Point(2, 2).moveReverse(Clock, Point(1, 3)) shouldBe Point(1, 2)
+      Point(4, 4).moveReverse(Clock, Point(1, 3)) shouldBe Point(3, 1)
+    }
+
+    it("rotate big objects counter clockwise with an odd row pivot") {
+      Point(0, 4).moveReverse(CounterClock, Point(1, 3)) shouldBe Point(0, 2)
+      Point(0, 3).moveReverse(CounterClock, Point(1, 3)) shouldBe Point(1, 2)
+      Point(1, 0).moveReverse(CounterClock, Point(1, 3)) shouldBe Point(3, 1)
+    }
+  }
 }
