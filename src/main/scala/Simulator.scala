@@ -41,22 +41,25 @@ class Simulator(p: Problem, seedIndex: Int) {
   val board = Array.ofDim[Boolean](p.width, p.height)
   p.filled foreach (point ⇒ board(point.x)(point.y) = true)
 
-  val source: Source = p.createSource(seedIndex)
+  private var source: Stream[Block] = p.createSource(seedIndex).asStream
+  def getSource: Stream[Block] = source
+
   var current: Block = null
-  val history: mutable.Set[Block] = mutable.Set.empty[Block]
+  private val history: mutable.Set[Block] = mutable.Set.empty[Block]
   spawn()
 
   var totalScore = 0
 
-  var linesCleared = 0
-  var linesClearedOld = 0
+  private var linesCleared = 0
+  private var linesClearedOld = 0
 
   var isGameOver = false
 
   private def spawn(): Simulator = {
-    val next = source.next
+    if (!source.isEmpty) {
+      val next = source.head
+      source = source.tail
 
-    if (next != null) {
       current = Simulator.calculateSpawnLocation(next, p.width)
 
       history.clear()

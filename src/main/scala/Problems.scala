@@ -112,13 +112,16 @@ case class Source(units: Array[Block], seed: Int, length: Int) {
   val rand = new Random(seed)
   var count = 0
 
-  def next(): Block = {
+  private def next(): Block = {
     count += 1
     if (count <= length)
       units(rand.next % units.length)
     else
       null
   }
+
+  def asStream: Stream[Block] =
+    Stream.continually(next()).takeWhile(_ != null)
 }
 
 object Problems {
