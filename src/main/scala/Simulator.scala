@@ -161,37 +161,49 @@ class Simulator(p: Problem, seedIndex: Int) {
   }
 
   def autoplay(): Simulator = {
-    val moves = nextMoves()
+    if (!isGameOver) {
+      val moves = nextMoves()
 
-    playAll((moves map (_.s)).mkString)
+      playAll((moves map (_.s)).mkString)
 
 
-    // because it must exist, obviously /s
-    val m = Move.all.find(move => isLocationInvalid(current.move(move), board)).get
+      // because it must exist, obviously /s
+      val m = Move.all.find(move => isLocationInvalid(current.move(move), board)).get
 
-    play(m)
-    draw()
+      play(m)
+      draw()
+    }
+
+    this
+  }
+
+  def output(): Simulator = {
+    def placeBlock(): Unit = {
+      val moves = nextMoves()
+      moves foreach play
+      // because it must exist, obviously /s
+      val m = Move.all.find(move => isLocationInvalid(current.move(move), board)).get
+      play(m)
+
+      println((moves map (_.s)).mkString + m.s)
+    }
+
+    while (!isGameOver) {
+      placeBlock()
+    }
 
     this
   }
 
   def nextMoves(): Seq[Move] =
-    lockableCurrentPermutations().toStream.map { target ⇒
-      // current == spawn location
-      val path = Pathfinder.find(board, target, current)
-      if (path.isEmpty)
-        null
-      else
-        (target, path)
-    }.filter {
-      _ != null
-    }.map { case (block, path) ⇒
+    lockableCurrentPermutations().toStream.map { block ⇒
       val newBoard = board.map(_.clone())
       block.members.foreach(point ⇒ newBoard(point.x)(point.y) = true)
-      (TotalFitness(newBoard), path)
-    }.sortBy {
-      _._1
-    }.reverse.head._2
+      (TotalFitness(newBoard), block)
+    }.sortBy(_._1).reverse.map { case (_, target) ⇒
+      // current == spawn location
+      Pathfinder.find(board, target, current)
+    }.filter(!_.isEmpty).head
 
   def canBeLockedByOneMove(block: Block): Boolean =
     Move.all.exists(move => isLocationInvalid(block.move(move), board))

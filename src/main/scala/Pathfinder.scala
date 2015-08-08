@@ -6,6 +6,7 @@ object Pathfinder {
 
   def find(board: Array[Array[Boolean]], target: Block, spawn: Block): Seq[Move] = {
 
+    //println("finding path...")
     //println("looking at board: ")
     //Simulator.draw(board, target)
     //println("------------------------")
@@ -43,7 +44,10 @@ object Pathfinder {
       }
     }
 
+    //println("---------")
+    //println("found path:")
     //result foreach println
+    //println("---------")
     result
   }
 }
