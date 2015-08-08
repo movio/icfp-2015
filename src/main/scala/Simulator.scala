@@ -113,6 +113,12 @@ class Simulator(p: Problem, seedIndex: Int) {
     this
   }
 
+  def canBeLockedByOneMove(block: Block): Boolean =
+    Move.all.exists(move => isLocationInvalid(block.move(move), board))
+
+  def lockableCurrentPermutations(): Set[Block] =
+    validCurrentPermutations().filter(canBeLockedByOneMove)
+
   def validCurrentPermutations(): Set[Block] =
     current.permutations(p.width, p.height).filterNot(isLocationInvalid(_, board))
 
