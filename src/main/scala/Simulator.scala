@@ -59,9 +59,10 @@ class Simulator(p: Problem, seedIndex: Int) {
     this
   }
 
-  // TODO: check for collisions with filled cells
   private def isLocationInvalid(b: Block): Boolean =
-    b.members exists (point ⇒ point.x < 0 || point.x >= p.width || point.y < 0 || point.y >= p.height)
+    b.members exists { point ⇒
+      point.x < 0 || point.x >= p.width || point.y < 0 || point.y >= p.height || board(point.x)(point.y)
+    }
 
   private def clearLines(): Simulator = {
     def isLineFull(y: Int): Boolean =
