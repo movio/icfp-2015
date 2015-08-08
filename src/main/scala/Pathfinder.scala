@@ -32,7 +32,7 @@ object Pathfinder {
     val spawnLocation = Simulator.calculateSpawnLocation(spawn, board.length)
     //println(spawnLocation)
 
-    // TODO separate empty list from no solution
+    // TODO separate empty list from no solution\
     var result = Seq.empty[Move]
     while (target != spawn && result.isEmpty && stream.headOption.isDefined) {
       //println("-------------------------")
