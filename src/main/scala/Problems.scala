@@ -123,6 +123,9 @@ case class Block(
   def addY(delta: Int): Block =
     copy(members map (p => p.copy(y = p.y + delta)), pivot.copy(y = pivot.y + delta))
 
+  def moveReverse(move: Move): Block =
+    Block(members map (p ⇒ p.moveReverse(move, pivot)), pivot.moveReverse(move, pivot))
+
 }
 
 object Problem {
