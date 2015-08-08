@@ -1,3 +1,5 @@
+import collection.mutable
+
 sealed abstract class Move(val s:String)
 object Move {
   def fromName(s: String): Move = {
@@ -23,6 +25,7 @@ class Simulator(p: Problem, seedIndex: Int) {
 
   val source: Source = p.createSource(seedIndex)
   var current: Block = null
+  val history: mutable.Set[Block] = mutable.Set.empty[Block]
   spawn()
 
   var totalScore = 0
@@ -51,6 +54,9 @@ class Simulator(p: Problem, seedIndex: Int) {
         next.members map (p ⇒ Point(p.x + xoffset, p.y + yoffset)),
         Point(next.pivot.x + xoffset, next.pivot.y + yoffset))
 
+      history.clear()
+      history.add(current)
+
       if (isLocationInvalid(current))
         gameOver()
     } else {
@@ -69,6 +75,13 @@ class Simulator(p: Problem, seedIndex: Int) {
     if(!isGameOver) {
       val next = current.move(move)
 
+      // error to repeat position
+      if (history.contains(next)) {
+        totalScore = 0
+        println("REPEAT POSITION")
+        gameOver()
+      }
+
       // check for invalid move
       if (isLocationInvalid(next)) {
         lock()
@@ -77,6 +90,7 @@ class Simulator(p: Problem, seedIndex: Int) {
         spawn()
       } else {
         current = next
+        history.add(current)
       }
     }
 
