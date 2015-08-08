@@ -154,6 +154,61 @@ class FitnessTests extends FunSpec with ShouldMatchers {
         f.apply(board) shouldBe -1.5d
       }
     }
+  }
 
+  describe("BumpinessFitness") {
+    describe("gives the negative sum of difference between column heights") {
+      it("counts a single column as zero") {
+        val board1 = Array(Array(false, false, false))
+        val board2 = Array(Array(true, true, true))
+        val f = new BumpinessFintness(1)
+        f.apply(board1) shouldBe 0
+        f.apply(board2) shouldBe 0
+      }
+
+      it("counts difference between adjacent columns") {
+        val board1 = Array(
+          Array(false, false, false),
+          Array(false, false, true)
+        )
+        val f = new BumpinessFintness(1)
+        f.apply(board1) shouldBe -1
+
+        val board2 = Array(
+          Array(false, false, true),
+          Array(false, false, false)
+        )
+        f.apply(board2) shouldBe -1
+      }
+
+      it("counts difference between adjacent columns if the difference is bigger") {
+        val board = Array(
+          Array(true, true, false),
+          Array(false, false, false)
+        )
+        val f = new BumpinessFintness(1)
+        f.apply(board) shouldBe -3
+      }
+
+      it("adds up the differences") {
+        val board = Array(
+          Array(true, true, false),
+          Array(false, false, false),
+          Array(true, true, false)
+        )
+        val f = new BumpinessFintness(1)
+        f.apply(board) shouldBe -6
+      }
+
+      it("applies the weight") {
+        val board = Array(
+          Array(true, true, false),
+          Array(false, false, false),
+          Array(true, true, false)
+        )
+        val f = new BumpinessFintness(3.0)
+        f.apply(board) shouldBe -18d
+      }
+    }
   }
 }

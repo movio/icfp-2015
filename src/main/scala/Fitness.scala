@@ -55,3 +55,25 @@ class HoleFitness(weight: Double) extends Function[Array[Array[Boolean]], Double
     } * (-weight)
   }
 }
+
+
+class BumpinessFintness(weight: Double) extends Function[Array[Array[Boolean]], Double] {
+  override def apply(board: Array[Array[Boolean]]): Double = {
+    if (board.length < 2) {
+      return 0
+    }
+    board.sliding(2).foldLeft(0) { (count, colWindow) =>
+      val List(first,second) = colWindow.toList
+      val firstHeight = substituteNegativeForLength(first.indexOf(true), first.length)
+      val secondHeight = substituteNegativeForLength(second.indexOf(true), first.length)
+      Math.abs(secondHeight - firstHeight) + count
+    } * (-weight)
+  }
+  private def substituteNegativeForLength(idx:Int, len:Int): Int= {
+    if (idx < 0) {
+      len
+    } else {
+      idx
+    }
+  }
+}
