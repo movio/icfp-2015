@@ -92,8 +92,9 @@ object TotalFitness {
   val lines = new CompleteLinesFitness(1)
   val holes = new HoleFitness(1)
   val bumps = new BumpinessFintness(1)
+  val fullness = new LineFullnessFitness(1)
 
   def apply(board: Array[Array[Boolean]]): Double = {
-    depth(board) + lines(board) + holes(board) + bumps(board)
+    depth(board) + lines(board) + holes(board) + bumps(board) + fullness(board)
   }
 }
