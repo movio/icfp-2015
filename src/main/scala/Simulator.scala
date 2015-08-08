@@ -1,11 +1,16 @@
-sealed abstract trait Move
+sealed abstract class Move(val s:String)
+object Move {
+  def fromName(s: String): Move = {
+    Seq(East, West, SouthEast, SouthWest, Clock, CounterClock).find(_.s == s).get
+  }
+}
 
-case object East extends Move
-case object West extends Move
-case object SouthEast extends Move
-case object SouthWest extends Move
-case object Clock extends Move
-case object CounterClock extends Move
+case object West extends Move("p")
+case object East extends Move("b")
+case object SouthWest extends Move("a")
+case object SouthEast extends Move("l")
+case object Clock extends Move("d")
+case object CounterClock extends Move("k")
 
 class Simulator(p: Problem, seedIndex: Int) {
 
@@ -13,7 +18,7 @@ class Simulator(p: Problem, seedIndex: Int) {
   val board = Array.ofDim[Boolean](p.width, p.height)
   p.filled foreach (point ⇒ board(point.x)(point.y) = true)
 
-  val source: Source = p.getSource(seedIndex)
+  val source: Source = p.createSource(seedIndex)
   var current: Block = null
   spawn()
 
@@ -22,38 +27,46 @@ class Simulator(p: Problem, seedIndex: Int) {
   var linesCleared = 0
   var linesClearedOld = 0
 
+  var isGameOver = false
+
   private def spawn(): Simulator = {
     // TODO check game end
-    val next = source.next
+    val next = source.next 
 
-    val xs = next.members map (_.x)
-    val ys = next.members map (_.y)
-    val xmin = xs.min
-    val xmax = xs.max
-    val ymin = ys.min
-
-    val left = (p.width - (xmax - xmin + 1)) / 2
-    val xoffset = left - xmin
-    val yoffset = -ymin
-
-    current = Block(
+    if (next != null) {
+      val xs = next.members map (_.x)
+      val ys = next.members map (_.y)
+      val xmin = xs.min
+      val xmax = xs.max
+      val ymin = ys.min
+  
+      val left = (p.width - (xmax - xmin + 1)) / 2
+      val xoffset = left - xmin
+      val yoffset = -ymin
+  
+      current = Block(
       next.members map (p ⇒ Point(p.x + xoffset, p.y + yoffset)),
       Point(next.pivot.x + xoffset, next.pivot.y + yoffset))
+    } else {
+      isGameOver = true
+    }
 
     this
   }
 
   def play(move: Move): Simulator = {
-    val next = current.move(move)
+    if(!isGameOver) {
+      val next = current.move(move)
 
-    // check for invalid move
-    if (isLocationInvalid(next)) {
-      lock()
-      clearLines()
-      score()
-      spawn()
-    } else {
-      current = next
+      // check for invalid move
+      if (isLocationInvalid(next)) {
+        lock()
+        clearLines()
+        score()
+        spawn()
+      } else {
+        current = next
+      }
     }
 
     this
@@ -156,6 +169,8 @@ class Simulator(p: Problem, seedIndex: Int) {
     }
     if (height % 2 == 0) print(" ")
     println(" V" * width)
+
+    if (isGameOver) println("GAME OVER")
 
     this
   }

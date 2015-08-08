@@ -99,10 +99,8 @@ case class Problem(
     sourceLength: Int,
     sourceSeeds: Array[Int]) {
 
-  val sources = mutable.Map.empty[Int, Source]
-
-  def getSource(index: Int): Source = {
-    sources.getOrElseUpdate(index, new Source(units, sourceSeeds(index), sourceLength))
+  def createSource(index: Int): Source = {
+    new Source(units, sourceSeeds(index), sourceLength)
   }
 }
 
