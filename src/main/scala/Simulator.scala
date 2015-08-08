@@ -113,6 +113,13 @@ class Simulator(p: Problem, seedIndex: Int) {
     this
   }
 
+  def candidateTargetBoards(): Stream[Array[Array[Boolean]]] =
+    lockableCurrentPermutations().toStream map { block ⇒
+      val newBoard = board.map(_.clone())
+      block.members.foreach(point ⇒ newBoard(point.x)(point.y) = true)
+      newBoard
+    }
+
   def canBeLockedByOneMove(block: Block): Boolean =
     Move.all.exists(move => isLocationInvalid(block.move(move), board))
 
