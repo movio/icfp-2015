@@ -9,7 +9,7 @@ object Point {
 case class Point(
     x: Int,
     y: Int) {
-  def move(move: Move): Point = {
+  def move(move: Move, pivot: Point): Point = {
     move match {
       case East ⇒ east()
       case West ⇒ west()
@@ -17,18 +17,52 @@ case class Point(
         if (y % 2 == 0) // even
           south()
         else // odd
-          south().move(East)
+          south().move(East, pivot)
       case SouthWest ⇒
         if (y % 2 == 0) // even
-          south().move(West)
+          south().move(West, pivot)
         else //odd
           south()
+      case Clock ⇒
+        translate(pivot).toCubePoint().move(Clock).toPoint().untranslate(pivot)
+      case CounterClock ⇒
+        translate(pivot).toCubePoint().move(CounterClock).toPoint().untranslate(pivot)
     }
+  }
+
+  def translate(pivot: Point): Point =
+    Point(x - pivot.x, y - (pivot.y - (pivot.y & 1)))
+
+  def untranslate(pivot: Point): Point =
+    Point(x + pivot.x, y + (pivot.y - (pivot.y & 1)))
+
+  def toCubePoint(): CubePoint = {
+    val cubeX = x - (y - (y & 1)) / 2
+    val cubeZ = y
+    val cubeY = -cubeX - cubeZ
+    CubePoint(cubeX, cubeY, cubeZ)
   }
 
   private def east(): Point = copy(x = this.x + 1)
   private def west(): Point = copy(x = this.x - 1)
   private def south(): Point = copy(y = this.y + 1)
+}
+
+case class CubePoint(x: Int, y: Int, z: Int) {
+
+  def toPoint(): Point = {
+    val col = x + (z - (z & 1)) / 2
+    val row = z
+    Point(col, row)
+  }
+
+  def move(move: Move): CubePoint = {
+    move match {
+      case Clock        ⇒ CubePoint(-z, -x, -y)
+      case CounterClock ⇒ CubePoint(-y, -z, -x)
+    }
+  }
+
 }
 
 object Block {
@@ -40,7 +74,7 @@ case class Block(
     pivot: Point) {
 
   def move(move: Move): Block =
-    Block(members map (p ⇒ p.move(move)), pivot.move(move))
+    Block(members map (p ⇒ p.move(move, pivot)), pivot.move(move, pivot))
 
 }
 
