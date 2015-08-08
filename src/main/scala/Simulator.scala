@@ -17,6 +17,24 @@ case object SouthEast extends Move("l")
 case object Clock extends Rotate("d")
 case object CounterClock extends Rotate("k")
 
+object Simulator {
+  def calculateSpawnLocation(block: Block, boardWidth: Int): Block = {
+    val xs = block.members map (_.x)
+    val ys = block.members map (_.y)
+    val xmin = xs.min
+    val xmax = xs.max
+    val ymin = ys.min
+
+    val left = (boardWidth - (xmax - xmin + 1)) / 2
+    val xoffset = left - xmin
+    val yoffset = -ymin
+
+    Block(
+      block.members map (p ⇒ Point(p.x + xoffset, p.y + yoffset)),
+      Point(block.pivot.x + xoffset, block.pivot.y + yoffset))
+  }
+}
+
 class Simulator(p: Problem, seedIndex: Int) {
 
   // TODO optimise this to (y, x) - makes line clearing much easier
@@ -39,19 +57,7 @@ class Simulator(p: Problem, seedIndex: Int) {
     val next = source.next
 
     if (next != null) {
-      val xs = next.members map (_.x)
-      val ys = next.members map (_.y)
-      val xmin = xs.min
-      val xmax = xs.max
-      val ymin = ys.min
-
-      val left = (p.width - (xmax - xmin + 1)) / 2
-      val xoffset = left - xmin
-      val yoffset = -ymin
-
-      current = Block(
-        next.members map (p ⇒ Point(p.x + xoffset, p.y + yoffset)),
-        Point(next.pivot.x + xoffset, next.pivot.y + yoffset))
+      current = Simulator.calculateSpawnLocation(next, p.width)
 
       history.clear()
       history.add(current)
