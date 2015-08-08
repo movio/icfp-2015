@@ -13,8 +13,16 @@ case class Point(
     move match {
       case East ⇒ east()
       case West ⇒ west()
-      case SouthEast ⇒ south().move(East)
-      case SouthWest ⇒ south().move(West)
+      case SouthEast ⇒
+        if (y % 2 == 0) // even
+          south()
+        else // odd
+          south().move(East)
+      case SouthWest ⇒
+        if (y % 2 == 0) // even
+          south().move(West)
+        else //odd
+          south()
     }
   }
 
