@@ -16,6 +16,8 @@ class Simulator(p: Problem, seedIndex: Int) {
   var current: Block = null
   spawn()
 
+  var totalScore = 0
+
   private def spawn(): Simulator = {
     if (current != null) throw new RuntimeException("current piece is still in play!!!!")
     // TODO check game end
@@ -43,8 +45,8 @@ class Simulator(p: Problem, seedIndex: Int) {
 
     // check for invalid move
     if (isLocationInvalid(next)) {
+      score()
       lock()
-      // TODO increase score
       // TODO check for clear lines
       spawn()
     } else {
@@ -58,7 +60,11 @@ class Simulator(p: Problem, seedIndex: Int) {
   private def isLocationInvalid(b: Block): Boolean =
     b.members exists (point ⇒ point.x < 0 || point.x >= p.width || point.y < 0 || point.y >= p.height)
 
-  def lock(): Simulator = {
+  private def score(): Simulator = {
+    this
+  }
+
+  private def lock(): Simulator = {
     current.members.foreach (point ⇒ board(point.x)(point.y) = true)
     current = null
     this
