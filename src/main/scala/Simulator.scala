@@ -2,9 +2,9 @@ import collection.mutable
 
 sealed abstract class Move(val s:String)
 object Move {
-  def fromName(s: String): Move = {
-    Seq(East, West, SouthEast, SouthWest, Clock, CounterClock).find(_.s == s).get
-  }
+  val all = Seq(East, West, SouthEast, SouthWest, Clock, CounterClock)
+  def fromName(s: String): Move =
+    all.find(_.s == s).get
 }
 
 sealed abstract class Rotate(s: String) extends Move(s)
