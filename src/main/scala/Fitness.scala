@@ -19,7 +19,7 @@ class CommandFitness(problem: Problem) extends FitnessFunction {
 
 // BIGGER is always BETTER
 
-class AggergateDepthFitness(weight: Double) extends Function[Array[Array[Boolean]], Double] {
+class AggregateDepthFitness(weight: Double) extends Function[Array[Array[Boolean]], Double] {
   override def apply(board: Array[Array[Boolean]]): Double = {
     board.foldLeft(0d) { (depth, col) ⇒
       val firstIdx = col.indexOf(true)
@@ -58,7 +58,7 @@ class HoleFitness(weight: Double) extends Function[Array[Array[Boolean]], Double
 }
 
 
-class BumpinessFintness(weight: Double) extends Function[Array[Array[Boolean]], Double] {
+class BumpinessFitness(weight: Double) extends Function[Array[Array[Boolean]], Double] {
   override def apply(board: Array[Array[Boolean]]): Double = {
     if (board.length < 2) {
       return 0
@@ -88,10 +88,10 @@ class LineFullnessFitness(weight: Double) extends Function[Array[Array[Boolean]]
 }
 
 object TotalFitness {
-  val depth = new AggergateDepthFitness(1)
+  val depth = new AggregateDepthFitness(1)
   val lines = new CompleteLinesFitness(1)
   val holes = new HoleFitness(1)
-  val bumps = new BumpinessFintness(1)
+  val bumps = new BumpinessFitness(1)
   val fullness = new LineFullnessFitness(1)
 
   def apply(board: Array[Array[Boolean]]): Double = {
