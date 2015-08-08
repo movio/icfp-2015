@@ -12,18 +12,19 @@ object Pathfinder {
     //println("------------------------")
 
     var history = mutable.Set.empty[Block]
+    history.add(target)
 
     // find one step out and filter invalid locations
     def expand(p: Partial): Stream[Partial] = {
-      history.add(p.location)
-
-      (Move.all map {m ⇒
+      (Move.all flatMap {m ⇒
         val prevLocation = p.location.moveReverse(m)
-        if (Simulator.isLocationInvalid(prevLocation, board))
-          null
-        else
-          Partial(prevLocation, m :: p.moves)
-      } filterNot (p ⇒ p == null || history.contains(p.location))).toStream
+        if (Simulator.isLocationInvalid(prevLocation, board) || history.contains(prevLocation))
+          None
+        else {
+          history.add(prevLocation)
+          Some(Partial(prevLocation, m :: p.moves))
+        }
+      }).toStream
     }
 
     var stream = Stream(Partial(target, Nil)) // step 0

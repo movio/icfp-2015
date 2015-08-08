@@ -1,4 +1,5 @@
 import collection.mutable
+import spray.json._
 
 sealed abstract class Move(val s:String)
 object Move {
@@ -177,7 +178,15 @@ class Simulator(p: Problem, seedIndex: Int) {
     this
   }
 
-  def output(): Simulator = {
+  case class Solution(problemId: Int, seed: Int, solution: String)
+  object Solution {
+    import DefaultJsonProtocol._
+    implicit val jf = jsonFormat3(Solution.apply)
+  }
+
+  def createSolution(): Solution = {
+    val commands = new StringBuilder
+
     def placeBlock(): Unit = {
       val moves = nextMoves()
       moves foreach play
@@ -185,13 +194,18 @@ class Simulator(p: Problem, seedIndex: Int) {
       val m = Move.all.find(move => isLocationInvalid(current.move(move), board)).get
       play(m)
 
-      println((moves map (_.s)).mkString + m.s)
+      commands.append((moves map (_.s)).mkString + m.s)
     }
 
     while (!isGameOver) {
       placeBlock()
     }
 
+    Solution(p.id, p.sourceSeeds(seedIndex), commands.toString)
+  }
+
+  def output(): Simulator = {
+    println("[" + createSolution().toJson.prettyPrint + "]")
     this
   }
 
@@ -218,7 +232,8 @@ class Simulator(p: Problem, seedIndex: Int) {
     val moves = s map (c ⇒ Move.fromName(c.toString))
     moves.foldLeft(this) { (s, move) ⇒
       val s2 = s.play(move).draw()
-      readLine()
+      //readLine()
+      Thread.sleep(100)
       s2
     }
   }
