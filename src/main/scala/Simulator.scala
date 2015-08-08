@@ -111,6 +111,9 @@ class Simulator(p: Problem, seedIndex: Int) {
     this
   }
 
+  def validCurrentPermutations(): Set[Block] =
+    current.permutations(p.width, p.height).filterNot(isLocationInvalid(_, board))
+
   def playAll(s: String): Simulator = {
     val moves = s map (c ⇒ Move.fromName(c.toString))
     moves.foldLeft(this) { (s, move) ⇒
