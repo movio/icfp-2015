@@ -33,9 +33,16 @@ object Simulator {
       block.members map (p ⇒ Point(p.x + xoffset, p.y + yoffset)),
       Point(block.pivot.x + xoffset, block.pivot.y + yoffset))
   }
+
+  def isLocationInvalid(block: Block, board: Array[Array[Boolean]]): Boolean = {
+    block.members exists { point ⇒
+      point.x < 0 || point.x >= board.length || point.y < 0 || point.y >= board(0).length || board(point.x)(point.y)
+    }
+  }
 }
 
 class Simulator(p: Problem, seedIndex: Int) {
+  import Simulator._
 
   // TODO optimise this to (y, x) - makes line clearing much easier
   val board = Array.ofDim[Boolean](p.width, p.height)
@@ -60,12 +67,12 @@ class Simulator(p: Problem, seedIndex: Int) {
       val next = source.head
       source = source.tail
 
-      current = Simulator.calculateSpawnLocation(next, p.width)
+      current = calculateSpawnLocation(next, p.width)
 
       history.clear()
       history.add(current)
 
-      if (isLocationInvalid(current))
+      if (isLocationInvalid(current, board))
         gameOver()
     } else {
       gameOver()
@@ -90,7 +97,7 @@ class Simulator(p: Problem, seedIndex: Int) {
       }
 
       // check for invalid move
-      if (isLocationInvalid(next)) {
+      if (isLocationInvalid(next, board)) {
         lock()
         clearLines()
         score()
@@ -112,11 +119,6 @@ class Simulator(p: Problem, seedIndex: Int) {
       s2
     }
   }
-
-  private def isLocationInvalid(b: Block): Boolean =
-    b.members exists { point ⇒
-      point.x < 0 || point.x >= p.width || point.y < 0 || point.y >= p.height || board(point.x)(point.y)
-    }
 
   private def clearLines(): Simulator = {
     def isLineFull(y: Int): Boolean =
