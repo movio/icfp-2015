@@ -18,6 +18,12 @@ case object SouthEast extends Move("l")
 case object Clock extends Rotate("d")
 case object CounterClock extends Rotate("k")
 
+case class Solution(problemId: Int, seed: Int, solution: String)
+object Solution {
+  import DefaultJsonProtocol._
+  implicit val jf = jsonFormat3(Solution.apply)
+}
+
 object Simulator {
   def calculateSpawnLocation(block: Block, boardWidth: Int): Block = {
     val xs = block.members map (_.x)
@@ -176,12 +182,6 @@ class Simulator(p: Problem, seedIndex: Int) {
     }
 
     this
-  }
-
-  case class Solution(problemId: Int, seed: Int, solution: String)
-  object Solution {
-    import DefaultJsonProtocol._
-    implicit val jf = jsonFormat3(Solution.apply)
   }
 
   def createSolution(): Solution = {
