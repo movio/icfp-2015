@@ -1,3 +1,12 @@
+sealed abstract trait Move
+
+case object East extends Move
+case object West extends Move
+case object SouthEast extends Move
+case object SouthWest extends Move
+case object Clock extends Move
+case object CounterClock extends Move
+
 class Simulator(p: Problem, seedIndex: Int) {
 
   val board = Array.ofDim[Boolean](p.width, p.height)
@@ -5,25 +14,57 @@ class Simulator(p: Problem, seedIndex: Int) {
 
   val source: Source = p.getSource(seedIndex)
   var current: Block = null
+  spawn()
 
-  def spawn(): Unit = {
-    //if (current != null) throw new RuntimeException("current piece is still in play!!!!")
+  private def spawn(): Simulator = {
+    if (current != null) throw new RuntimeException("current piece is still in play!!!!")
+    // TODO check game end
     val next = source.next
 
     val xs = next.members map (_.x)
-    val min = xs.min
-    val max = xs.max
+    val ys = next.members map (_.y)
+    val xmin = xs.min
+    val xmax = xs.max
+    val ymin = ys.min
 
-    val left = (p.width - (max - min + 1)) / 2
-    val xoffset = left - min
-    val yoffset = next.members.map(_.y).min
+    val left = (p.width - (xmax - xmin + 1)) / 2
+    val xoffset = left - xmin
+    val yoffset = -ymin
 
     current = Block(
-      next.members map (p ⇒ Point(p.x + xoffset, p.y - yoffset)),
-      Point(next.pivot.x + xoffset, next.pivot.y - yoffset))
+      next.members map (p ⇒ Point(p.x + xoffset, p.y + yoffset)),
+      Point(next.pivot.x + xoffset, next.pivot.y + yoffset))
+
+    this
   }
 
-  def draw(): Unit = {
+  def play(move: Move): Simulator = {
+    val next = current.move(move)
+
+    // check for invalid move
+    if (isLocationInvalid(next)) {
+      lock()
+      // TODO increase score
+      // TODO check for clear lines
+      spawn()
+    } else {
+      current = next
+    }
+
+    this
+  }
+
+  // TODO: check for collisions with filled cells
+  private def isLocationInvalid(b: Block): Boolean =
+    b.members exists (point ⇒ point.x < 0 || point.x >= p.width || point.y < 0 || point.y >= p.height)
+
+  def lock(): Simulator = {
+    current.members.foreach (point ⇒ board(point.x)(point.y) = true)
+    current = null
+    this
+  }
+
+  def draw(): Simulator = {
     val width = p.width
     val height = p.height
 
@@ -68,5 +109,7 @@ class Simulator(p: Problem, seedIndex: Int) {
     }
     if (height % 2 == 0) print(" ")
     println(" V" * width)
+
+    this
   }
 }

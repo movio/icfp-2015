@@ -16,7 +16,28 @@ object Block {
 }
 case class Block(
   members: Set[Point],
-  pivot: Point)
+  pivot: Point) {
+
+  def move(move: Move): Block = {
+    move match {
+      case East ⇒ east()
+      case West ⇒ west()
+    }
+  }
+
+  private def east(): Block = {
+    val newMembers = members map (p ⇒ p.copy(x = p.x + 1))
+    val newPivot = pivot.copy(x = pivot.x + 1)
+    Block(newMembers, newPivot)
+  }
+
+  private def west(): Block = {
+    val newMembers = members map (p ⇒ p.copy(x = p.x - 1))
+    val newPivot = pivot.copy(x = pivot.x - 1)
+    Block(newMembers, newPivot)
+  }
+
+}
 
 object Problem {
   import DefaultJsonProtocol._
