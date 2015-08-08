@@ -288,7 +288,7 @@ class Simulator(p: Problem, seedIndex: Int) {
   def draw(): Simulator = {
 
     Simulator.draw(board, current)
-
+    TotalFitness.printFitnessScores(board)
     println(s"Score: $totalScore")
     println()
 

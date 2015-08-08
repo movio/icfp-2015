@@ -63,20 +63,35 @@ class BumpinessFitness(weight: Double) extends Function[Array[Array[Boolean]], D
 
 class LineFullnessFitness(weight: Double) extends Function[Array[Array[Boolean]], Double] {
   override def apply(board: Array[Array[Boolean]]): Double = {
-    board.transpose.foldLeft(0) { (numCleared, row) ⇒
-      row.count(b => b) + numCleared
+    board.transpose.foldLeft(0) { (count, row) ⇒
+      row.sliding(2).foldLeft(0) { (rowCount, window) =>
+        val List(first,second) = window.toList
+        if(first && second) 1 + rowCount else rowCount
+      } + count
     } * weight
   }
 }
 
+class StackingFitness(weight:Double) extends  Function[Array[Array[Boolean]], Double] {
+  override def apply(board: Array[Array[Boolean]]): Double = 1
+}
+
 object TotalFitness {
   val depth = new AggregateDepthFitness(1)
-  val lines = new CompleteLinesFitness(1)
-  val holes = new HoleFitness(1)
-  val bumps = new BumpinessFitness(1)
-  val fullness = new LineFullnessFitness(1)
+  val lines = new CompleteLinesFitness(10)
+  val holes = new HoleFitness(0.2)
+  val bumps = new BumpinessFitness(10)
+  val fullness = new LineFullnessFitness(5)
 
   def apply(board: Array[Array[Boolean]]): Double = {
     depth(board) + lines(board) + holes(board) + bumps(board) + fullness(board)
+  }
+  
+  def printFitnessScores(board: Array[Array[Boolean]]) = {
+    println("Depth score: " + depth(board))
+    println("Lines score: " + lines(board))
+    println("Holes score: " + holes(board))
+    println("Bumps score: " + bumps(board))
+    println("Fullness score: " + fullness(board))
   }
 }
