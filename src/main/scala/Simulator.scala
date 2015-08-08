@@ -5,12 +5,15 @@ object Move {
   }
 }
 
+sealed abstract class Rotate(s: String) extends Move(s)
+
 case object West extends Move("p")
 case object East extends Move("b")
 case object SouthWest extends Move("a")
 case object SouthEast extends Move("l")
-case object Clock extends Move("d")
-case object CounterClock extends Move("k")
+
+case object Clock extends Rotate("d")
+case object CounterClock extends Rotate("k")
 
 class Simulator(p: Problem, seedIndex: Int) {
 
@@ -31,7 +34,7 @@ class Simulator(p: Problem, seedIndex: Int) {
 
   private def spawn(): Simulator = {
     // TODO check game end
-    val next = source.next 
+    val next = source.next
 
     if (next != null) {
       val xs = next.members map (_.x)
@@ -39,11 +42,11 @@ class Simulator(p: Problem, seedIndex: Int) {
       val xmin = xs.min
       val xmax = xs.max
       val ymin = ys.min
-  
+
       val left = (p.width - (xmax - xmin + 1)) / 2
       val xoffset = left - xmin
       val yoffset = -ymin
-  
+
       current = Block(
       next.members map (p ⇒ Point(p.x + xoffset, p.y + yoffset)),
       Point(next.pivot.x + xoffset, next.pivot.y + yoffset))

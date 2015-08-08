@@ -23,10 +23,8 @@ case class Point(
           south().move(West, pivot)
         else //odd
           south()
-      case Clock ⇒
-        translate(pivot).toCubePoint().move(Clock).toPoint().untranslate(pivot)
-      case CounterClock ⇒
-        translate(pivot).toCubePoint().move(CounterClock).toPoint().untranslate(pivot)
+      case rotate: Rotate ⇒
+        translate(pivot).toCubePoint().move(rotate).toPoint().untranslate(pivot)
     }
   }
 
@@ -56,7 +54,7 @@ case class CubePoint(x: Int, y: Int, z: Int) {
     Point(col, row)
   }
 
-  def move(move: Move): CubePoint = {
+  def move(move: Rotate): CubePoint = {
     move match {
       case Clock        ⇒ CubePoint(-z, -x, -y)
       case CounterClock ⇒ CubePoint(-y, -z, -x)
