@@ -160,12 +160,38 @@ class Simulator(p: Problem, seedIndex: Int) {
     this
   }
 
-  def candidateTargetBoards(): Stream[Array[Array[Boolean]]] =
-    lockableCurrentPermutations().toStream map { block ⇒
+  def autoplay(): Simulator = {
+    val moves = nextMoves()
+
+    playAll((moves map (_.s)).mkString)
+
+
+    // because it must exist, obviously /s
+    val m = Move.all.find(move => isLocationInvalid(current.move(move), board)).get
+
+    play(m)
+    draw()
+
+    this
+  }
+
+  def nextMoves(): Seq[Move] =
+    lockableCurrentPermutations().toStream.map { target ⇒
+      // current == spawn location
+      val path = Pathfinder.find(board, target, current)
+      if (path.isEmpty)
+        null
+      else
+        (target, path)
+    }.filter {
+      _ != null
+    }.map { case (block, path) ⇒
       val newBoard = board.map(_.clone())
       block.members.foreach(point ⇒ newBoard(point.x)(point.y) = true)
-      newBoard
-    }
+      (TotalFitness(newBoard), path)
+    }.sortBy {
+      _._1
+    }.reverse.head._2
 
   def canBeLockedByOneMove(block: Block): Boolean =
     Move.all.exists(move => isLocationInvalid(block.move(move), board))

@@ -6,6 +6,10 @@ object Pathfinder {
 
   def find(board: Array[Array[Boolean]], target: Block, spawn: Block): Seq[Move] = {
 
+    //println("looking at board: ")
+    //Simulator.draw(board, target)
+    //println("------------------------")
+
     var history = mutable.Set.empty[Block]
 
     // find one step out and filter invalid locations
@@ -26,8 +30,9 @@ object Pathfinder {
     val spawnLocation = Simulator.calculateSpawnLocation(spawn, board.length)
     //println(spawnLocation)
 
+    // TODO separate empty list from no solution
     var result = Seq.empty[Move]
-    while (result.isEmpty && stream.headOption.isDefined) {
+    while (target != spawn && result.isEmpty && stream.headOption.isDefined) {
       //println("-------------------------")
       //stream foreach println
       stream find (_.location == spawnLocation) match {
