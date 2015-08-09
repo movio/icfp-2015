@@ -106,7 +106,7 @@ class StackingFitness(weight:Double) extends  Function[Array[Array[Boolean]], Do
 
 class FitnessEvaluator(aggregateWeight: Double, bumpinessWeight: Double,
   completeLinesWeight: Double, holesWeight: Double, fullnessWeight: Double,
-  snugnessWeight: Double) {
+  snugnessWeight: Double = 0) {
 
   val depth = new AggregateDepthFitness(aggregateWeight)
   val bumps = new BumpinessFitness(bumpinessWeight)
