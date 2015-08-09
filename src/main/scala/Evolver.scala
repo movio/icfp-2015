@@ -23,7 +23,7 @@ object Evolver {
       println(s"// Problem $i: Weight for holes: $holes")
       println(s"// Problem $i: Weight for fullness: $fullness")
       println(s"// Problem $i: Weight for snuggness: $fullness")
-      println(s"val evolver_p$i = new FitnessEvaluator(aggregate, bumpiness, completeLines, holes, fullness, snuggness)")
+      println(s"val evolver_p$i = new FitnessEvaluator($aggregate, $bumpiness, $completeLines, $holes, $fullness, $snuggness)")
 
 
 

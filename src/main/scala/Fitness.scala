@@ -77,14 +77,17 @@ class BumpinessFitness(weight: Double) extends Function[Array[Array[Boolean]], D
 
 class LineFullnessFitness(weight: Double) extends Function[Array[Array[Boolean]], Double] {
   override def apply(board: Array[Array[Boolean]]): Double = {
+    val maxFullnessScore = ((board.length * board.length) * board(0).length).toDouble
     val transposedBoard = board.transpose
 
-    transposedBoard.foldLeft(0) { (count, row) ⇒      val rowCount = row.sliding(2).foldLeft(0) { (rowCount, window) =>
+    val score = transposedBoard.foldLeft(0) { (count, row) ⇒      val rowCount = row.sliding(2).foldLeft(0) { (rowCount, window) =>
         val List(first,second) = window.toList
         if(first && second) 1 + rowCount else rowCount
       }
       (rowCount*rowCount) + count
-    } * weight
+    }
+    val normalized = score / maxFullnessScore
+    normalized * weight
   }
 }
 

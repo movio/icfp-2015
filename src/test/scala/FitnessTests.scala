@@ -205,24 +205,23 @@ class FitnessTests extends FunSpec with ShouldMatchers {
       it("counts the single true values on a row as zero") {
 
         val board = Array(Array(false), Array(false), Array(true))
-        f.apply(board) shouldBe 0d
+        f.apply(board) shouldBe 0d / 9
       }
 
       it("counts the true values on a single row if there is more than one") {
         val board1 = Array(Array(false), Array(true), Array(true))
-        f.apply(board1) shouldBe 1d
+        f.apply(board1) shouldBe 1d / 9
 
         val board2 = Array(Array(true), Array(true), Array(true))
-        f.apply(board2) shouldBe 4d
-
+        f.apply(board2) shouldBe 4d / 9
 
         val board = Array(Array(true), Array(true), Array(true), Array(true), Array(true), Array(true))
-        f.apply(board) shouldBe 25d
+        f.apply(board) shouldBe 25d / 36d
       }
 
       it("counts each segment in in a broken up row") {
         val board = Array(Array(true), Array(true), Array(false), Array(true), Array(false), Array(true), Array(true))
-        f.apply(board) shouldBe 4d
+        f.apply(board) shouldBe 4d / 49d
       }
 
       it("adds up the fullness of each row") {
@@ -232,7 +231,7 @@ class FitnessTests extends FunSpec with ShouldMatchers {
           Array(false, true),          
           Array(true, true)
         )
-        f.apply(board1) shouldBe 2d
+        f.apply(board1) shouldBe 2d / 32d
       }
 
       it("applies the weight") {
@@ -242,7 +241,7 @@ class FitnessTests extends FunSpec with ShouldMatchers {
           Array(false, true),          
           Array(true, false)
         )
-        f.apply(board1) shouldBe 0.5d      
+        f.apply(board1) shouldBe 0.5d / 18d
       }
 
     }
