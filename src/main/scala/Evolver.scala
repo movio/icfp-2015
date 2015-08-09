@@ -3,8 +3,6 @@ import org.jgap.audit.FitnessImprovementMonitor
 import org.jgap._
 import org.jgap.impl.{WeightedRouletteSelector, DoubleGene, DefaultConfiguration}
 
-import scala.util.Random
-
 object Evolver {
   def evolveAll() = {
     (3 to 23).par foreach { i =>
