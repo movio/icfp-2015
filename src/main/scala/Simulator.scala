@@ -237,6 +237,7 @@ class Simulator(p: Problem, seedIndex: Int, fitnessEvaluator: FitnessEvaluator =
       block.members.foreach(point ⇒ newBoard(point.x)(point.y) = true)
       (fitnessEvaluator(newBoard), block)
     }.sortBy(_._1).reverse.flatMap { case (_, target) ⇒
+
       // current == spawn location
       //Pathfinder.find(board, target, current)
       Pathfinder.astar(board, target, current)
