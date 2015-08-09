@@ -79,38 +79,6 @@ class SimulatorTest extends FunSpec with ShouldMatchers {
     Point(3, 1).move(CounterClock, Point(1, 3)) shouldBe Point(1, 0)
   }
 
-  it("should generate permutations of the one piece unit in a 2 x 2 board") {
-    Block(Set(Point(0, 0)), Point(0, 0)).permutations(2, 2) shouldBe Set(
-      Block(Set(Point(0, 0)), Point(0, 0)),
-      Block(Set(Point(0, 1)), Point(0, 1)),
-      Block(Set(Point(1, 0)), Point(1, 0)),
-      Block(Set(Point(1, 1)), Point(1, 1))
-    )
-  }
-
-  it("should generate permutations of a simple two-piece unit in a 2 x 2 board") {
-    Block(Set(Point(0, 0), Point(1, 0)), Point(0, 0)).permutations(2, 2) shouldBe Set(
-      Block(Set(Point(1,0), Point(1,1)),Point(1,0)),
-      Block(Set(Point(0,1), Point(0,0)),Point(0,1)),
-      Block(Set(Point(0,1), Point(1,0)),Point(0,1)),
-      Block(Set(Point(0,1), Point(1,1)),Point(0,1)),
-      Block(Set(Point(1,0), Point(0,0)),Point(1,0))
-    )
-  }
-
-  it("should generate permutations of a simple two-piece unit in a 3 x 3 board") {
-    val perms: Set[Block] = Block(Set(Point(0, 0), Point(2, 0)), Point(1, 0)).permutations(3, 3)
-    perms should contain (Block(Set(Point(0,0), Point(2,0)), Point(1,0)))
-    perms should contain (Block(Set(Point(0,1), Point(2,1)), Point(1,1)))
-    perms should contain (Block(Set(Point(0,2), Point(2,2)), Point(1,2)))
-    perms should contain (Block(Set(Point(0,2), Point(1,0)), Point(0,1)))
-    perms should contain (Block(Set(Point(1,2), Point(2,0)), Point(1,1)))
-    perms should contain (Block(Set(Point(1,2), Point(2,0)), Point(1,1)))
-    perms should contain (Block(Set(Point(0,0), Point(1,2)), Point(0,1)))
-    perms should contain (Block(Set(Point(1,0), Point(2,2)), Point(1,1)))
-    perms should have size 7
-  }
-
   describe("reverse") {
     it("should move pieces East reverse correctly") {
       Point(1, 0).moveReverse(East) shouldBe Point(0, 0)
@@ -150,6 +118,76 @@ class SimulatorTest extends FunSpec with ShouldMatchers {
       Point(0, 4).moveReverse(CounterClock, Point(1, 3)) shouldBe Point(0, 2)
       Point(0, 3).moveReverse(CounterClock, Point(1, 3)) shouldBe Point(1, 2)
       Point(1, 0).moveReverse(CounterClock, Point(1, 3)) shouldBe Point(3, 1)
+    }
+  }
+
+  describe("permutations") {
+    it("should generate permutations of the one piece unit in a 2 x 2 board") {
+      val block = Block(Set(Point(0, 0)), Point(0, 0))
+      block.permutations(2, 2).map(_.members).toList should contain theSameElementsAs Seq(
+        Set(Point(0, 0)),
+        Set(Point(0, 1)),
+        Set(Point(1, 0)),
+        Set(Point(1, 1))
+      )
+    }
+
+    it("should generate permutations of a simple two-piece unit in a 2 x 2 board") {
+      val block = Block(Set(Point(0, 0), Point(1, 0)), Point(0, 0))
+      block.permutations(2, 2).map(_.members).toList should contain theSameElementsAs Seq(
+        Set(Point(1,0), Point(1,1)),
+        Set(Point(0,1), Point(0,0)),
+        Set(Point(0,1), Point(1,0)),
+        Set(Point(0,1), Point(1,1)),
+        Set(Point(1,0), Point(0,0))
+      )
+    }
+
+    it("should generate permutations of a simple two-piece unit in a 3 x 3 board") {
+      val block = Block(Set(Point(0, 0), Point(2, 0)), Point(1, 0))
+      block.permutations(3, 3).map(_.members).toList should contain theSameElementsAs Seq(
+        Set(Point(0,0), Point(2,0)),
+        Set(Point(0,1), Point(2,1)),
+        Set(Point(0,2), Point(2,2)),
+
+        Set(Point(0,2), Point(1,0)),
+        Set(Point(1,2), Point(2,0)),
+
+        Set(Point(0,0), Point(1,2)),
+        Set(Point(1,0), Point(2,2))
+      )
+    }
+
+    it("l shape") {
+      val block = Block(Set(Point(0,1),Point(0,2),Point(0,3)), Point(1,2))
+      block.permutations(2, 4).map(_.members).toList should contain theSameElementsAs Seq(
+        Set(Point(0,1),Point(0,2),Point(0,3)),
+        Set(Point(1,0),Point(0,1),Point(1,2)),
+        Set(Point(1,1),Point(1,2),Point(1,3)),
+
+        Set(Point(0,0),Point(0,1),Point(1,1)),
+        Set(Point(0,2),Point(0,3),Point(1,3)),
+
+        Set(Point(1,1),Point(0,2),Point(1,2)),
+
+        Set(Point(0,0),Point(0,1),Point(0,2)),
+        Set(Point(1,0),Point(1,1),Point(1,2)),
+        Set(Point(0,1),Point(1,2),Point(0,3)),
+
+        Set(Point(0,0),Point(1,0),Point(1,1)),
+        Set(Point(0,2),Point(1,2),Point(1,3)),
+
+        Set(Point(0,1),Point(1,1),Point(0,2))
+      )
+    }
+
+    it("squiggle") {
+      val block = Block(Set(Point(0,1),Point(0,2),Point(0,3), Point(0,4)), Point(0,1))
+      block.permutations(2, 5).map(_.members).toList should contain theSameElementsAs Seq(
+        Set(Point(0,1),Point(0,2),Point(0,3),Point(0,4)),
+        Set(Point(1,1),Point(1,2),Point(1,3),Point(1,4)),
+        Set(Point(1,0),Point(0,1),Point(1,2),Point(0,3))
+      )
     }
   }
 }

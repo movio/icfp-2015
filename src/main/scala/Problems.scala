@@ -23,7 +23,8 @@ case class Point(
         else //odd
           south()
       case rotate: Rotate ⇒
-        translate(pivot).toCubePoint().move(rotate).toPoint().untranslate(pivot)
+        val pivotCubePoint = pivot.toCubePoint()
+        toCubePoint().translate(pivotCubePoint).move(rotate).untranslate(pivotCubePoint).toPoint()
     }
   }
 
@@ -41,10 +42,13 @@ case class Point(
           north()
         else //odd
           north().move(East, pivot)
-      case Clock ⇒
-        translate(pivot).toCubePoint().move(CounterClock).toPoint().untranslate(pivot)
-      case CounterClock ⇒
-        translate(pivot).toCubePoint().move(Clock).toPoint().untranslate(pivot)
+      case rotate: Rotate ⇒
+        val opposite = rotate match {
+          case Clock        ⇒ CounterClock
+          case CounterClock ⇒ Clock
+        }
+        val pivotCubePoint = pivot.toCubePoint()
+        toCubePoint().translate(pivotCubePoint).move(opposite).untranslate(pivotCubePoint).toPoint()
     }
   }
 
@@ -112,9 +116,10 @@ case class Block(
       x <- -boardWidth until boardWidth
       y <- -boardHeight until boardHeight
       r <- 0 to 5
-    } yield copy().addX(x).addY(y).move(Clock, r)
+    } yield copy(members = members map (_.untranslate(Point(x,y))), pivot = pivot.untranslate(Point(x,y))).move(Clock, r)
     val setOfBlocks: Set[Block] = blocks.filter(_.isInsideBoard(boardWidth, boardHeight)).toSet
-    setOfBlocks.groupBy(_.members).map(_._2.head).toSet // ignore pivot in comparison
+    setOfBlocks
+    //setOfBlocks.groupBy(_.members).map(_._2.head).toSet // ignore pivot in comparison
   }
 
   def addX(delta: Int): Block =

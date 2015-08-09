@@ -46,4 +46,12 @@ class MovesTest extends FunSpec with ShouldMatchers {
       List(CounterClock, West, SouthEast, Clock)
     )
   }
+
+  it("finds isomorphisms in bounded time") {
+    val moves: Seq[Move] = PowerWords.toMoves("Cthulu")
+    Moves.findINSS(moves, 1000).length shouldBe (484  +- 100)
+    Moves.findINSS(moves, 2000).length shouldBe (964  +- 100)
+    Moves.findINSS(moves, 3000).length shouldBe (1310 +- 100)
+  }
+
 }

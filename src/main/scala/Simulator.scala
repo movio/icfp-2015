@@ -37,6 +37,14 @@ object Moves {
   def isomorphicNonStutteringSequences(s: Seq[Move]): Stream[Seq[Move]] =
     Stream.from(1) flatMap (i ⇒ isomorphicNonStutteringSequencesOfLength(s, i))
 
+  def findINSS(s: Seq[Move], maxTimeMillis: Long): Seq[Seq[Move]] = {
+    val now = System.currentTimeMillis()
+    println("....")
+    val res: Stream[Seq[Move]] = isomorphicNonStutteringSequences(s).takeWhile(_ => System.currentTimeMillis() - now < maxTimeMillis)
+    println("!!!!")
+    res
+  }
+
 }
 
 sealed abstract class Rotate(s: String) extends Move(s)
@@ -56,6 +64,9 @@ object Solution {
 }
 
 object Simulator {
+
+  val powerWords = PowerWords(3000)
+
   def calculateSpawnLocation(block: Block, boardWidth: Int): Block = {
     val xs = block.members map (_.x)
     val ys = block.members map (_.y)
@@ -259,16 +270,25 @@ class Simulator(p: Problem, seedIndex: Int, fitnessEvaluator: FitnessEvaluator =
     this
   }
 
-  def nextMoves(): Seq[Move] =
+  def nextMoves(): Seq[Move] = {
+    val tempBoard = Array.ofDim[Boolean](p.width, p.height)
     lockableCurrentPermutations().toStream.map { block ⇒
-      val newBoard = board.map(_.clone())
-      block.members.foreach(point ⇒ newBoard(point.x)(point.y) = true)
-      (fitnessEvaluator(newBoard), block)
+      // more efficient than cloning the array
+      for (point ← block.members) {
+        tempBoard(point.x)(point.y) = board(point.x)(point.y)
+        board(point.x)(point.y) = true
+      }
+      val score = fitnessEvaluator(board)
+      for (point ← block.members) {
+        board(point.x)(point.y) = tempBoard(point.x)(point.y)
+      }
+      (score, block)
     }.sortBy(_._1).reverse.flatMap { case (_, target) ⇒
       // current == spawn location
       //Pathfinder.find(board, target, current)
       Pathfinder.astar(board, target, current)
     }.head
+  }
 
   def canBeLockedByOneMove(block: Block): Boolean =
     Move.all.exists(move ⇒ isLocationInvalid(block.move(move), board))
@@ -276,8 +296,9 @@ class Simulator(p: Problem, seedIndex: Int, fitnessEvaluator: FitnessEvaluator =
   def lockableCurrentPermutations(): Set[Block] =
     validCurrentPermutations().filter(canBeLockedByOneMove)
 
-  def validCurrentPermutations(): Set[Block] =
+  def validCurrentPermutations(): Set[Block] = {
     current.permutations(p.width, p.height).filterNot(isLocationInvalid(_, board))
+  }
 
   def playAll(s: String): Simulator = {
     val moves = s map (c ⇒ Move.fromName(c.toString))
