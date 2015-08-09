@@ -1,6 +1,6 @@
 object WeightedEvaluators {
 
-  val Problem0WeightFor_aggregate = 8.67005540815273
+  /*val Problem0WeightFor_aggregate = 8.67005540815273
   val Problem0WeightFor_bumpiness = 4.397865979086141
   val Problem0WeightFor_completeLines =  7.2287692370121
   val Problem0WeightFor_holes = 3.1386345213950992
@@ -97,15 +97,15 @@ object WeightedEvaluators {
   val Problem17WeightFor_holes = 0.12663264785833128
   val Problem17WeightFor_fullness = 8.21260008097342
   val fitnessEvaluator17 = new FitnessEvaluator(Problem17WeightFor_aggregate, Problem17WeightFor_bumpiness, Problem17WeightFor_completeLines, Problem17WeightFor_holes, Problem17WeightFor_fullness)
-
-  val evaluators = List(
-    fitnessEvaluator0, fitnessEvaluator1,
+*/
+  val evaluators = List()
+    /*fitnessEvaluator0, fitnessEvaluator1,
     fitnessEvaluator9, fitnessEvaluator10, 
     fitnessEvaluator11, fitnessEvaluator21, 
     fitnessEvaluator4, fitnessEvaluator22, 
     fitnessEvaluator23, fitnessEvaluator8, 
     fitnessEvaluator13, fitnessEvaluator6, 
-    fitnessEvaluator16, fitnessEvaluator17)
+    fitnessEvaluator16, fitnessEvaluator17)*/
 }
 
 

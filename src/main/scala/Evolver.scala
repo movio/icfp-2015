@@ -5,8 +5,8 @@ import org.jgap.impl.{WeightedRouletteSelector, DoubleGene, DefaultConfiguration
 
 object Evolver {
   def evolveAll() = {
-    (3 to 23).par foreach { i =>
-      println(s"Evolving for problem $i")
+    (0 to 23).par foreach { i =>
+      println(s"// Evolving for problem $i")
       val problem = Problems.load(i)
       val fitteset = FitnessEvolver.evolve(problem)
       val aggregate = fitteset.getGenes()(0).getAllele.asInstanceOf[Double]
@@ -14,15 +14,20 @@ object Evolver {
       val completeLines = fitteset.getGenes()(2).getAllele.asInstanceOf[Double]
       val holes = fitteset.getGenes()(3).getAllele.asInstanceOf[Double]
       val fullness = fitteset.getGenes()(4).getAllele.asInstanceOf[Double]
+      val snuggness = fitteset.getGenes()(4).getAllele.asInstanceOf[Double]
 
-      println(s"Problem $i: Got fittest with score: ${fitteset.getFitnessValue}")
-      println(s"Problem $i: Weight for aggregate: $aggregate")
-      println(s"Problem $i: Weight for bumpiness: $bumpiness")
-      println(s"Problem $i: Weight for completeLines: $completeLines")
-      println(s"Problem $i: Weight for holes: $holes")
-      println(s"Problem $i: Weight for fullness: $fullness")
+      println(s"// Problem $i: Got fittest with score: ${fitteset.getFitnessValue}")
+      println(s"// Problem $i: Weight for aggregate: $aggregate")
+      println(s"// Problem $i: Weight for bumpiness: $bumpiness")
+      println(s"// Problem $i: Weight for completeLines: $completeLines")
+      println(s"// Problem $i: Weight for holes: $holes")
+      println(s"// Problem $i: Weight for fullness: $fullness")
+      println(s"// Problem $i: Weight for snuggness: $fullness")
+      println(s"val evolver_p$i = new FitnessEvaluator(aggregate, bumpiness, completeLines, holes, fullness, snuggness)")
 
-      println(s"Endo of evolution for problem $i")
+
+
+      println(s"// End of evolution for problem $i")
       println()
       println()
     }
@@ -41,7 +46,8 @@ object FitnessEvolver {
       new DoubleGene(conf, 0, 10), // bumpiness
       new DoubleGene(conf, 0, 10), // completeLines
       new DoubleGene(conf, 0, 10), // holes
-      new DoubleGene(conf, 0, 10) // fullness
+      new DoubleGene(conf, 0, 10), // fullness
+      new DoubleGene(conf, 0, 10) // snuggness
     )
 
     val chromosome = new Chromosome(conf, sampleGenes)
@@ -78,8 +84,9 @@ class WeightFitness(problem: Problem) extends FitnessFunction {
     val completeLines = iChromosome.getGenes()(2).getAllele.asInstanceOf[Double]
     val holes = iChromosome.getGenes()(3).getAllele.asInstanceOf[Double]
     val fullness = iChromosome.getGenes()(4).getAllele.asInstanceOf[Double]
+    val snuggness = iChromosome.getGenes()(5).getAllele.asInstanceOf[Double]
 
-    val evaluator = new FitnessEvaluator(aggregate,bumpiness,completeLines,holes,fullness)
+    val evaluator = new FitnessEvaluator(aggregate,bumpiness,completeLines,holes,fullness,snuggness)
 
     val idx = problem.sourceSeeds.length - 1
     val simulator = new Simulator(problem, idx, evaluator)
