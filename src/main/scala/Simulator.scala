@@ -212,7 +212,7 @@ class Simulator(p: Problem, seedIndex: Int, fitnessEvaluator: FitnessEvaluator =
         val positions: Seq[Block] = Seq(current) ++ (1 to m.length).map { case i ⇒
           m.take(i).foldLeft(current) { (b, move) ⇒ b.move(move) }
         }
-        !positions.exists(block => isLocationInvalid(block, board))
+        !positions.exists(block => isLocationInvalid(block, board)) && positions.toSet.size == positions.size
       }
 
       val movesWithPowerWords = powerWords.findValidEmbedding(moves, isValidMove)
