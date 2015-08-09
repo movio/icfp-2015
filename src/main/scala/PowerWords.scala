@@ -70,4 +70,7 @@ case class PowerWords(maxTimeMillis: Int) {
     }
   }.toMap
 
+  def findValidEmbedding(moves: Seq[Move], isValidMove: (Seq[Move] => Boolean)): Seq[Move] =
+    PowerWords.findValidEmbedding(moves, embeddingsMap, isValidMove)
+
 }
