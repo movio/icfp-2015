@@ -37,6 +37,11 @@ object Moves {
   def isomorphicNonStutteringSequences(s: Seq[Move]): Stream[Seq[Move]] =
     Stream.from(1) flatMap (i ⇒ isomorphicNonStutteringSequencesOfLength(s, i))
 
+  def findINSS(s: Seq[Move], maxTimeMillis: Long): Seq[Seq[Move]] = {
+    val now = System.currentTimeMillis()
+    isomorphicNonStutteringSequences(s).takeWhile(_ => System.currentTimeMillis() - now < maxTimeMillis)
+  }
+
 }
 
 sealed abstract class Rotate(s: String) extends Move(s)
