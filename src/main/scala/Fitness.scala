@@ -1,10 +1,8 @@
 
 // BIGGER is always BETTER
-
 class AggregateDepthFitness(weight: Double) extends Function[Array[Array[Boolean]], Double] {
   override def apply(board: Array[Array[Boolean]]): Double = {
-    board.foldLeft(0d) { (depth, col) ⇒
-      val firstIdx = col.indexOf(true)
+    board.foldLeft(0d) { (depth, col) ⇒      val firstIdx = col.indexOf(true)
       if (firstIdx == -1) {
         depth + col.length
       } else {
@@ -16,10 +14,8 @@ class AggregateDepthFitness(weight: Double) extends Function[Array[Array[Boolean
 
 class CompleteLinesFitness(weight: Double) extends Function[Array[Array[Boolean]], Double] {
   override def apply(board: Array[Array[Boolean]]): Double = {
-    board.transpose.foldLeft(0) { (numCleared, row) ⇒
-      if (row.forall(b => b)) {
-        numCleared + 1
-      } else {
+    board.transpose.foldLeft(0) { (numCleared, row) ⇒      if (row.forall(b => b)) {
+        numCleared + 1      } else {
         numCleared
       }
     } * weight
@@ -43,8 +39,7 @@ class HoleFitness(weight: Double) extends Function[Array[Array[Boolean]], Double
 class BumpinessFitness(weight: Double) extends Function[Array[Array[Boolean]], Double] {
   override def apply(board: Array[Array[Boolean]]): Double = {
     if (board.length < 2) {
-      return 0
-    }
+      return 0    }
     board.sliding(2).foldLeft(0) { (count, colWindow) =>
       val List(first,second) = colWindow.toList
       val firstHeight = substituteNegativeForLength(first.indexOf(true), first.length)
@@ -63,25 +58,28 @@ class BumpinessFitness(weight: Double) extends Function[Array[Array[Boolean]], D
 
 class LineFullnessFitness(weight: Double) extends Function[Array[Array[Boolean]], Double] {
   override def apply(board: Array[Array[Boolean]]): Double = {
-    board.transpose.foldLeft(0) { (count, row) ⇒
-      row.sliding(2).foldLeft(0) { (rowCount, window) =>
+    val transposedBoard = board.transpose
+
+    transposedBoard.foldLeft(0) { (count, row) ⇒      val rowCount = row.sliding(2).foldLeft(0) { (rowCount, window) =>
         val List(first,second) = window.toList
         if(first && second) 1 + rowCount else rowCount
-      } + count
+      }
+      (rowCount*rowCount) + count
     } * weight
   }
 }
 
 class StackingFitness(weight:Double) extends  Function[Array[Array[Boolean]], Double] {
-  override def apply(board: Array[Array[Boolean]]): Double = 1
-}
+  override def apply(board: Array[Array[Boolean]]): Double = 1}
 
-object TotalFitness {
-  val depth = new AggregateDepthFitness(1)
-  val lines = new CompleteLinesFitness(10)
-  val holes = new HoleFitness(0.2)
-  val bumps = new BumpinessFitness(10)
-  val fullness = new LineFullnessFitness(5)
+class FitnessEvaluator(aggregateWeight: Double, bumpinessWeight: Double, 
+  completeLinesWeight: Double, holesWeight: Double, fullnessWeight: Double) {
+
+  val depth = new AggregateDepthFitness(aggregateWeight)
+  val bumps = new BumpinessFitness(bumpinessWeight)
+  val lines = new CompleteLinesFitness(completeLinesWeight)
+  val holes = new HoleFitness(holesWeight)
+  val fullness = new LineFullnessFitness(fullnessWeight)
 
   def apply(board: Array[Array[Boolean]]): Double = {
     depth(board) + lines(board) + holes(board) + bumps(board) + fullness(board)
@@ -95,3 +93,9 @@ object TotalFitness {
     println("Fullness score: " + fullness(board))
   }
 }
+
+object TotalFitness extends FitnessEvaluator(1,100,0.5,1,1) { 
+
+}
+
+

@@ -1,3 +1,4 @@
+
 import org.scalatest._
 import org.scalatest.matchers.ShouldMatchers
 
@@ -22,9 +23,9 @@ class FitnessTests extends FunSpec with ShouldMatchers {
 
       it("counts the adds the depth for each column") {
         val board = Array(
-          Array(false, false, false),
-          Array(false, false, true),
-          Array(false, true, false),
+          Array(false, false, false),          
+          Array(false, false, true),          
+          Array(false, true, false),          
           Array(true, false, false)
         )
         f.apply(board) shouldBe 6d
@@ -33,9 +34,9 @@ class FitnessTests extends FunSpec with ShouldMatchers {
       it("applies it's weight to the output") {
         val f = new AggregateDepthFitness(0.5)
         val board = Array(
-          Array(false, false, false),
-          Array(false, false, true),
-          Array(false, true, false),
+          Array(false, false, false),          
+          Array(false, false, true),          
+          Array(false, true, false),          
           Array(true, false, false)
         )
         f.apply(board) shouldBe 3d
@@ -73,9 +74,9 @@ class FitnessTests extends FunSpec with ShouldMatchers {
 
       it("adds the counts for several completed rows") {
         val board = Array(
-          Array(true, false, true),
-          Array(true, false, true),
-          Array(true, false, true),
+          Array(true, false, true),          
+          Array(true, false, true),          
+          Array(true, false, true),          
           Array(true, false, true)
         )
         f.apply(board) shouldBe 2d
@@ -84,9 +85,9 @@ class FitnessTests extends FunSpec with ShouldMatchers {
       it("applies it's weight to the output") {
         val f = new CompleteLinesFitness(0.5)
         val board = Array(
-          Array(true, false, true),
-          Array(true, false, true),
-          Array(true, false, true),
+          Array(true, false, true),          
+          Array(true, false, true),          
+          Array(true, false, true),          
           Array(true, false, true)
         )
         f.apply(board) shouldBe 1d
@@ -119,26 +120,26 @@ class FitnessTests extends FunSpec with ShouldMatchers {
 
       it("counts each enclosed space") {
         val board = Array(Array(true,false,false))
-        f.apply(board) shouldBe -2d
+        f.apply(board) shouldBe -2d      
       }
 
       it("sums the counts of enclosed spaces in each column") {
         val board = Array(
-          Array(true,false,false),
-          Array(false,true,false),
+          Array(true,false,false),          
+          Array(false,true,false),          
           Array(false,false,true)
         )
-        f.apply(board) shouldBe -3d
+        f.apply(board) shouldBe -3d      
       }
 
       it("applies the weight") {
         val f = new HoleFitness(0.5)
         val board = Array(
-          Array(true,false,false),
-          Array(false,true,false),
+          Array(true,false,false),          
+          Array(false,true,false),          
           Array(false,false,true)
         )
-        f.apply(board) shouldBe -1.5d
+        f.apply(board) shouldBe -1.5d      
       }
     }
   }
@@ -156,41 +157,37 @@ class FitnessTests extends FunSpec with ShouldMatchers {
 
       it("counts difference between adjacent columns") {
         val board1 = Array(
-          Array(false, false, false),
+          Array(false, false, false),          
           Array(false, false, true)
         )
         f.apply(board1) shouldBe -1
-
         val board2 = Array(
-          Array(false, false, true),
+          Array(false, false, true),          
           Array(false, false, false)
         )
-        f.apply(board2) shouldBe -1
-      }
+        f.apply(board2) shouldBe -1      }
 
       it("counts difference between adjacent columns if the difference is bigger") {
         val board = Array(
-          Array(true, true, false),
+          Array(true, true, false),          
           Array(false, false, false)
         )
-        f.apply(board) shouldBe -3
-      }
+        f.apply(board) shouldBe -3      }
 
       it("adds up the differences") {
 
         val board = Array(
-          Array(true, true, false),
-          Array(false, false, false),
+          Array(true, true, false),          
+          Array(false, false, false),          
           Array(true, true, false)
         )
-        f.apply(board) shouldBe -6
-      }
+        f.apply(board) shouldBe -6      }
 
       it("applies the weight") {
         val f = new BumpinessFitness(3.0)
         val board = Array(
-          Array(true, true, false),
-          Array(false, false, false),
+          Array(true, true, false),          
+          Array(false, false, false),          
           Array(true, true, false)
         )
         f.apply(board) shouldBe -18d
@@ -212,20 +209,23 @@ class FitnessTests extends FunSpec with ShouldMatchers {
         f.apply(board1) shouldBe 1d
 
         val board2 = Array(Array(true), Array(true), Array(true))
+        f.apply(board2) shouldBe 4d
 
-        f.apply(board2) shouldBe 2d
+
+        val board = Array(Array(true), Array(true), Array(true), Array(true), Array(true), Array(true))
+        f.apply(board) shouldBe 25d
       }
 
       it("counts each segment in in a broken up row") {
         val board = Array(Array(true), Array(true), Array(false), Array(true), Array(false), Array(true), Array(true))
-        f.apply(board) shouldBe 2d
+        f.apply(board) shouldBe 4d
       }
 
       it("adds up the fullness of each row") {
         val board1 = Array(
-          Array(true, true),
-          Array(true, false),
-          Array(false, true),
+          Array(true, true),          
+          Array(true, false),          
+          Array(false, true),          
           Array(true, true)
         )
         f.apply(board1) shouldBe 2d
@@ -234,11 +234,11 @@ class FitnessTests extends FunSpec with ShouldMatchers {
       it("applies the weight") {
         val f = new LineFullnessFitness(0.5)
         val board1 = Array(
-          Array(true, true),
-          Array(false, true),
+          Array(true, true),          
+          Array(false, true),          
           Array(true, false)
         )
-        f.apply(board1) shouldBe 0.5d
+        f.apply(board1) shouldBe 0.5d      
       }
 
     }
