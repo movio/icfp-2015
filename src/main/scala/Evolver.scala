@@ -1,3 +1,4 @@
+
 import org.jgap.audit.FitnessImprovementMonitor
 import org.jgap._
 import org.jgap.impl.{WeightedRouletteSelector, DoubleGene, DefaultConfiguration}
@@ -66,18 +67,14 @@ object FitnessEvolver {
 
     population.evolve(fitnessMonitor)
 
+
     population.getFittestChromosome
   }
 }
 
 class WeightFitness(problem: Problem) extends FitnessFunction {
-
-  var i = 0
-  var round = 0
   override def evaluate(iChromosome: IChromosome): Double = {
-    if(i % 100 == 0) {
-      round += 1
-    }
+
     val aggregate = iChromosome.getGenes()(0).getAllele.asInstanceOf[Double]
     val bumpiness = iChromosome.getGenes()(1).getAllele.asInstanceOf[Double]
     val completeLines = iChromosome.getGenes()(2).getAllele.asInstanceOf[Double]
@@ -118,3 +115,5 @@ Application data:null
 
 
  */
+
+
