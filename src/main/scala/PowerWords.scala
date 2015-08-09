@@ -21,24 +21,26 @@ object PowerWords {
 
   def accept(s: String): Boolean = Moves.nonStuttering(toMoves(s))
 
-  def findValidEmbedding(moves: Seq[Move], embeddingsMap: Map[Seq[Move], Seq[Move]], isValidMove: (Seq[Move] => Boolean)): Seq[Move] = {
+  def findValidEmbedding(moves: Seq[Move], embeddingsMap: Map[Seq[Move], String], isValidMove: (Seq[Move] => Boolean)): String = {
     def s(m: Seq[Move]): String = m.map(_.s).mkString
     var i = 0
     var done = false
-    var current = moves
+    var current = s(moves)
     while (!done) {
       done = true
-      embeddingsMap foreach { case (embedding, powerMove) =>
-        val pos = s(current.drop(i)).indexOf(s(embedding))
+      embeddingsMap foreach { case (embedding, powerWord) =>
+        val pos = current.drop(i).indexOf(s(embedding))
         if (pos != -1) {
           val prefix = current.take(i + pos)
           val suffix = current.drop(i + pos).drop(embedding.length)
-          val candidate = prefix ++ powerMove ++ suffix
-          if (isValidMove(candidate) && Moves.nonStuttering(candidate)) {
-//            println("using powerMove " + powerMove + " with isomorphism " + embedding)
+          val candidate = prefix ++ powerWord ++ suffix
+
+          val candidateMoves = toMoves(candidate)
+          if (isValidMove(candidateMoves) && Moves.nonStuttering(candidateMoves)) {
+//            println("using power word " + powerWord + " with isomorphism " + embedding)
             done = false
             current = candidate
-            i = prefix.length + powerMove.length
+            i = prefix.length + powerWord.length
           }
         }
       }
@@ -51,30 +53,30 @@ object PowerWords {
 case class PowerWords(maxTimeMillis: Int) {
 
   val powerWords: Seq[String] = Seq(
-    "Ei!",
-    "Ia! Ia",
+    "ei!",
+    "ia! ia!",
     "r'lyeh",
     "cthulu",
     "davar",
     "old ones",
-//    "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
-//    "Cthulhu fhtagn",
-    "Lovecraft",
-    "Azathoth",
-    "2xjw 4s"
+//    "ph'nglui mglw'nafh cthulhu r'lyeh wgah'nagl fhtagn",
+//    "cthulhu fhtagn",
+    "lovecraft",
+    "azathoth"
   )
 
-  val powerMoves: Seq[Seq[Move]] = powerWords map PowerWords.toMoves
+  //val powerMoves: Seq[Seq[Move]] = powerWords map PowerWords.toMoves
 
-  val embeddingsMap: Map[Seq[Move], Seq[Move]] = {
-    powerMoves flatMap { powerMove: Seq[Move] ⇒
-      val equivalentMoves: Seq[Seq[Move]] = Moves.findINSS(powerMove, maxTimeMillis / powerWords.length)
-      val tuples: Seq[(Seq[Move], Seq[Move])] = equivalentMoves map (moves ⇒ moves -> powerMove)
+  val embeddingsMap: Map[Seq[Move], String] = {
+    powerWords flatMap { powerWord: String ⇒
+      val equivalentMoves: Seq[Seq[Move]] =
+        Moves.findINSS(PowerWords.toMoves(powerWord), maxTimeMillis / powerWords.length)
+      val tuples: Seq[(Seq[Move], String)] = equivalentMoves map (moves ⇒ moves -> powerWord)
       tuples
     }
   }.toMap
 
-  def findValidEmbedding(moves: Seq[Move], isValidMove: (Seq[Move] => Boolean)): Seq[Move] =
+  def findValidEmbedding(moves: Seq[Move], isValidMove: (Seq[Move] => Boolean)): String =
     PowerWords.findValidEmbedding(moves, embeddingsMap, isValidMove)
 
 }

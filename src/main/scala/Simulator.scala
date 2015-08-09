@@ -62,7 +62,7 @@ object Solution {
 
 object Simulator {
 
-  val powerWords = PowerWords(10000)
+  val powerWords = PowerWords(1000)
 
   def calculateSpawnLocation(block: Block, boardWidth: Int): Block = {
     val xs = block.members map (_.x)
@@ -208,19 +208,7 @@ class Simulator(p: Problem, seedIndex: Int, fitnessEvaluator: FitnessEvaluator =
     if (!isGameOver) {
       val moves = nextMoves()
 
-      def isValidMove(m: Seq[Move]): Boolean = {
-        val positions: Seq[Block] = Seq(current) ++ (1 to m.length).map { case i ⇒
-          m.take(i).foldLeft(current) { (b, move) ⇒ b.move(move) }
-        }
-        !positions.exists(block => isLocationInvalid(block, board)) && positions.toSet.size == positions.size
-      }
-
-      val movesWithPowerWords = powerWords.findValidEmbedding(moves, isValidMove)
-//      println(moves)
-//      println(movesWithPowerWords)
-//      readLine()
-
-      playAll((movesWithPowerWords map (_.s)).mkString)
+      playAll(moves)
 
       // because it must exist, obviously /s
       val m = Move.all.find(move ⇒ isLocationInvalid(current.move(move), board)).get
@@ -236,7 +224,7 @@ class Simulator(p: Problem, seedIndex: Int, fitnessEvaluator: FitnessEvaluator =
     if (!isGameOver) {
       val moves = nextMoves()
 
-      quietPlayAll((moves map (_.s)).mkString)
+      quietPlayAll(moves)
 
       // because it must exist, obviously /s
       val m = Move.all.find(move => isLocationInvalid(current.move(move), board)).get
@@ -248,7 +236,7 @@ class Simulator(p: Problem, seedIndex: Int, fitnessEvaluator: FitnessEvaluator =
   }
 
   def quietPlayAll(s: String): Simulator = {
-    val moves = s map (c ⇒ Move.fromName(c.toString))
+    val moves = s map PowerWords.charToMove//(c ⇒ Move.fromName(c.toString))
     moves.foldLeft(this) { (s, move) ⇒
       s.play(move)
     }
@@ -259,12 +247,12 @@ class Simulator(p: Problem, seedIndex: Int, fitnessEvaluator: FitnessEvaluator =
 
     def placeBlock(): Unit = {
       val moves = nextMoves()
-      moves foreach play
+      moves foreach (c ⇒ play(PowerWords.charToMove(c)))
       // because it must exist, obviously /s
       val m = Move.all.find(move ⇒ isLocationInvalid(current.move(move), board)).get
       play(m)
 
-      commands.append((moves map (_.s)).mkString + m.s)
+      commands.append(moves + m.s)
     }
 
     while (!isGameOver) {
@@ -279,24 +267,37 @@ class Simulator(p: Problem, seedIndex: Int, fitnessEvaluator: FitnessEvaluator =
     this
   }
 
-  def nextMoves(): Seq[Move] = {
+  private def isValidMove(m: Seq[Move]): Boolean = {
+    val positions: Seq[Block] = Seq(current) ++ (1 to m.length).map { i ⇒
+      m.take(i).foldLeft(current) { (b, move) ⇒ b.move(move) }
+    }
+    !positions.exists(block => isLocationInvalid(block, board)) && positions.toSet.size == positions.size
+  }
+
+  // string so we encode power words
+  def nextMoves(): String = {
     val tempBoard = Array.ofDim[Boolean](p.width, p.height)
-    lockableCurrentPermutations().toStream.map { block ⇒
-      // more efficient than cloning the array
-      for (point ← block.members) {
-        tempBoard(point.x)(point.y) = board(point.x)(point.y)
-        board(point.x)(point.y) = true
-      }
-      val score = fitnessEvaluator(board)
-      for (point ← block.members) {
-        board(point.x)(point.y) = tempBoard(point.x)(point.y)
-      }
-      (score, block)
-    }.sortBy(_._1).reverse.flatMap { case (_, target) ⇒
-      // current == spawn location
-      //Pathfinder.find(board, target, current)
-      Pathfinder.astar(board, target, current)
-    }.head
+
+    val moves =
+      lockableCurrentPermutations().toStream.map { block ⇒
+        // more efficient than cloning the array
+        for (point ← block.members) {
+          tempBoard(point.x)(point.y) = board(point.x)(point.y)
+          board(point.x)(point.y) = true
+        }
+        val score = fitnessEvaluator(board)
+        for (point ← block.members) {
+          board(point.x)(point.y) = tempBoard(point.x)(point.y)
+        }
+        (score, block)
+      }.sortBy(_._1).reverse.flatMap { case (_, target) ⇒
+        // current == spawn location
+        //Pathfinder.find(board, target, current)
+        Pathfinder.astar(board, target, current)
+      }.head
+
+    val movesWithPowerWords = powerWords.findValidEmbedding(moves, isValidMove)
+    movesWithPowerWords
   }
 
   def canBeLockedByOneMove(block: Block): Boolean =
@@ -310,11 +311,11 @@ class Simulator(p: Problem, seedIndex: Int, fitnessEvaluator: FitnessEvaluator =
   }
 
   def playAll(s: String): Simulator = {
-    val moves = s map (c ⇒ Move.fromName(c.toString))
+    val moves = s map PowerWords.charToMove//(c ⇒ Move.fromName(c.toString))
     moves.foldLeft(this) { (s, move) ⇒
       val s2 = s.play(move).draw()
       //readLine()
-      Thread.sleep(100)
+      Thread.sleep(60)
       s2
     }
   }
