@@ -38,11 +38,14 @@ object Main {
         }
 
         val problem = sb.toString.parseJson.convertTo[Problem]
+        val evaluator = WeightedEvaluators.evaluatorsById.getOrElse(problem.id, TotalFitness)
 
         val solutions =
           (0 until problem.sourceSeeds.length) map { i ⇒
-            val simulator = new Simulator(problem, i)
-            simulator.createSolution()
+            val simulator = new Simulator(problem, i, evaluator)
+            val solution = simulator.createSolution()
+            System.err.println(s"Score: ${simulator.actualTotalScore} (${simulator.totalScore} + ${simulator.powerWordScore})")
+            solution
           }
 
         solutions
@@ -50,5 +53,6 @@ object Main {
 
     import DefaultJsonProtocol._
     println(solutions.toJson.prettyPrint)
+
   }
 }

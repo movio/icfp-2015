@@ -28,7 +28,7 @@ object PowerWords {
     var current = s(moves)
     while (!done) {
       done = true
-      embeddingsMap foreach { case (embedding, powerWord) =>
+      embeddingsMap.toSeq.sortBy(_._2.length).reverse foreach { case (embedding, powerWord) =>
         val pos = current.drop(i).indexOf(s(embedding))
         if (pos != -1) {
           val prefix = current.take(i + pos)
@@ -48,29 +48,28 @@ object PowerWords {
     current
   }
 
-}
-
-case class PowerWords(maxTimeMillis: Int) {
 
   val powerWords: Seq[String] = Seq(
     "ei!",
     "ia! ia!",
     "r'lyeh",
-    "cthulu",
-    "davar",
-    "old ones",
-//    "ph'nglui mglw'nafh cthulhu r'lyeh wgah'nagl fhtagn",
+    "yuggoth"
+//    "cthulhu",
+//    "davar",
+//    "old ones",
+//    "ph'nglui mglw'nafh cthulhu r'lyeh wgah'nagl fhtagn!",
 //    "cthulhu fhtagn",
-    "lovecraft",
-    "azathoth"
+//    "lovecraft",
+//    "azathoth"
   )
+}
 
-  //val powerMoves: Seq[Seq[Move]] = powerWords map PowerWords.toMoves
+case class PowerWords(maxTimeMillis: Int) {
 
   val embeddingsMap: Map[Seq[Move], String] = {
-    powerWords flatMap { powerWord: String ⇒
+    PowerWords.powerWords flatMap { powerWord: String ⇒
       val equivalentMoves: Seq[Seq[Move]] =
-        Moves.findINSS(PowerWords.toMoves(powerWord), maxTimeMillis / powerWords.length)
+        Moves.findINSS(PowerWords.toMoves(powerWord), maxTimeMillis / PowerWords.powerWords.length)
       val tuples: Seq[(Seq[Move], String)] = equivalentMoves map (moves ⇒ moves -> powerWord)
       tuples
     }
