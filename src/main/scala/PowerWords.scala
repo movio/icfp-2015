@@ -21,6 +21,30 @@ object PowerWords {
 
   def accept(s: String): Boolean = Moves.nonStuttering(toMoves(s))
 
+  def findValidEmbedding(moves: Seq[Move], embeddingsMap: Map[Seq[Move], Seq[Move]], isValidMove: (Seq[Move] => Boolean)): Seq[Move] = {
+    def s(m: Seq[Move]): String = m.map(_.s).mkString
+    var i = 0
+    var done = false
+    var current = moves
+    while (!done) {
+      done = true
+      embeddingsMap foreach { case (embedding, powerMove) =>
+        val pos = s(current.drop(i)).indexOf(s(embedding))
+        if (pos != -1) {
+          val prefix = current.take(i + pos)
+          val suffix = current.drop(i + pos).drop(embedding.length)
+          val candidate = prefix ++ powerMove ++ suffix
+          if (isValidMove(candidate)) {
+            done = false
+            current = candidate
+            i = prefix.length + powerMove.length
+          }
+        }
+      }
+    }
+    current
+  }
+
 }
 
 case class PowerWords(maxTimeMillis: Int) {
@@ -34,7 +58,6 @@ case class PowerWords(maxTimeMillis: Int) {
     "old ones",
 //    "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
 //    "Cthulhu fhtagn",
-    "Aleister",
     "Lovecraft",
     "Azathoth"
   )
