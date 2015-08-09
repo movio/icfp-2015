@@ -48,9 +48,6 @@ object PowerWords {
     current
   }
 
-}
-
-case class PowerWords(maxTimeMillis: Int) {
 
   val powerWords: Seq[String] = Seq(
     "ei!",
@@ -58,19 +55,20 @@ case class PowerWords(maxTimeMillis: Int) {
     "r'lyeh",
     "cthulhu",
     "davar",
-    "old ones",
-//    "ph'nglui mglw'nafh cthulhu r'lyeh wgah'nagl fhtagn",
+//    "old ones",
+//    "ph'nglui mglw'nafh cthulhu r'lyeh wgah'nagl fhtagn!",
 //    "cthulhu fhtagn",
-    "lovecraft",
+//    "lovecraft",
     "azathoth"
   )
+}
 
-  //val powerMoves: Seq[Seq[Move]] = powerWords map PowerWords.toMoves
+case class PowerWords(maxTimeMillis: Int) {
 
   val embeddingsMap: Map[Seq[Move], String] = {
-    powerWords flatMap { powerWord: String ⇒
+    PowerWords.powerWords flatMap { powerWord: String ⇒
       val equivalentMoves: Seq[Seq[Move]] =
-        Moves.findINSS(PowerWords.toMoves(powerWord), maxTimeMillis / powerWords.length)
+        Moves.findINSS(PowerWords.toMoves(powerWord), maxTimeMillis / PowerWords.powerWords.length)
       val tuples: Seq[(Seq[Move], String)] = equivalentMoves map (moves ⇒ moves -> powerWord)
       tuples
     }

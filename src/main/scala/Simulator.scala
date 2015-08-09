@@ -62,7 +62,7 @@ object Solution {
 
 object Simulator {
 
-  val powerWords = PowerWords(1000)
+  val powerWords = PowerWords(10000)
 
   def calculateSpawnLocation(block: Block, boardWidth: Int): Block = {
     val xs = block.members map (_.x)
@@ -149,6 +149,12 @@ class Simulator(p: Problem, seedIndex: Int, fitnessEvaluator: FitnessEvaluator =
   spawn()
 
   var totalScore = 0
+  val powerWordCounts = mutable.Map.empty[String, Int]
+  def powerWordScore =
+    powerWordCounts.foldLeft(0) { case (total, (word, count)) ⇒
+      total + (2 * word.length * count) + (if (count > 0) 300 else 0)
+    }
+  def actualTotalScore = totalScore + powerWordScore
 
   private var linesCleared = 0
   private var linesClearedOld = 0
@@ -204,43 +210,26 @@ class Simulator(p: Problem, seedIndex: Int, fitnessEvaluator: FitnessEvaluator =
     this
   }
 
-  def autoplay(): Simulator = {
+  def autoplay(silent: Boolean = false): Simulator = {
     if (!isGameOver) {
       val moves = nextMoves()
 
-      playAll(moves)
+      playAll(moves, silent)
 
       // because it must exist, obviously /s
       val m = Move.all.find(move ⇒ isLocationInvalid(current.move(move), board)).get
 
       play(m)
-      draw()
+
+      if (!silent)
+        draw()
     }
 
     this
   }
 
-  def quietAutoplay() = {
-    if (!isGameOver) {
-      val moves = nextMoves()
-
-      quietPlayAll(moves)
-
-      // because it must exist, obviously /s
-      val m = Move.all.find(move => isLocationInvalid(current.move(move), board)).get
-
-      play(m)
-    }
-
-    this
-  }
-
-  def quietPlayAll(s: String): Simulator = {
-    val moves = s map PowerWords.charToMove//(c ⇒ Move.fromName(c.toString))
-    moves.foldLeft(this) { (s, move) ⇒
-      s.play(move)
-    }
-  }
+  def quietAutoplay() =
+    autoplay(silent = true)
 
   def createSolution(): Solution = {
     val commands = new StringBuilder
@@ -259,7 +248,7 @@ class Simulator(p: Problem, seedIndex: Int, fitnessEvaluator: FitnessEvaluator =
       placeBlock()
     }
 
-    Solution(p.id, p.sourceSeeds(seedIndex), "alpha", commands.toString)
+    Solution(p.id, p.sourceSeeds(seedIndex), "beta", commands.toString)
   }
 
   def output(): Simulator = {
@@ -310,13 +299,35 @@ class Simulator(p: Problem, seedIndex: Int, fitnessEvaluator: FitnessEvaluator =
     current.permutations(p.width, p.height).filterNot(isLocationInvalid(_, board))
   }
 
-  def playAll(s: String): Simulator = {
+  private def countSubstrings(haystack: String, needle: String): Int = {
+    var count = 0
+    var i = haystack.indexOf(needle, 0)
+
+    while (i != -1) {
+      i = haystack.indexOf(needle, i + 1)
+      count += 1
+    }
+
+    count
+  }
+
+  def playAll(s: String, silent: Boolean = false): Simulator = {
     val moves = s map PowerWords.charToMove//(c ⇒ Move.fromName(c.toString))
+
+    PowerWords.powerWords foreach { word ⇒
+      val count = countSubstrings(s, word)
+      powerWordCounts(word) = powerWordCounts.getOrElse(word, 0) + count
+    }
+
     moves.foldLeft(this) { (s, move) ⇒
-      val s2 = s.play(move).draw()
-      //readLine()
-      Thread.sleep(60)
-      s2
+      s.play(move)
+
+      if (!silent) {
+        s.draw()
+        Thread.sleep(60)
+      }
+
+      s
     }
   }
 
@@ -357,8 +368,6 @@ class Simulator(p: Problem, seedIndex: Int, fitnessEvaluator: FitnessEvaluator =
     val lineBonus = if (linesClearedOld > 1) (linesClearedOld - 1) * points / 10 else 0
     totalScore += points + lineBonus
 
-    // TODO power bonus
-
     this
   }
 
@@ -371,7 +380,9 @@ class Simulator(p: Problem, seedIndex: Int, fitnessEvaluator: FitnessEvaluator =
 
     Simulator.draw(board, current)
     TotalFitness.printFitnessScores(board)
-    println(s"Score: $totalScore")
+    val currentPowerWordScore = powerWordScore
+    println(s"Total Score: ${totalScore + currentPowerWordScore} ($totalScore + $currentPowerWordScore)")
+    println(powerWordCounts)
     println()
 
     if (isGameOver) println("GAME OVER")
