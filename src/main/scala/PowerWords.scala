@@ -22,3 +22,29 @@ object PowerWords {
   def accept(s: String): Boolean = Moves.nonStuttering(toMoves(s))
 
 }
+
+case class PowerWords(maxTimeMillis: Int) {
+
+  val powerWords: Seq[String] = Seq(
+    "Ei",
+    "Ia! Ia",
+    "r'lyeh",
+    "cthulu",
+    "davar",
+    "old ones",
+//    "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
+//    "Cthulhu fhtagn",
+    "Aleister",
+    "Lovecraft",
+    "Azathoth"
+  )
+
+  val powerMoves: Seq[Seq[Move]] = powerWords map PowerWords.toMoves
+
+  val embeddingsMap: Map[Seq[Move], Seq[Move]] = {
+    powerMoves flatMap { powerMove: Seq[Move] ⇒
+      Moves.findINSS(powerMove, maxTimeMillis / powerWords.length) map (moves ⇒ moves -> powerMove)
+    }
+  }.toMap
+
+}

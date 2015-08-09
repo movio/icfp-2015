@@ -39,7 +39,10 @@ object Moves {
 
   def findINSS(s: Seq[Move], maxTimeMillis: Long): Seq[Seq[Move]] = {
     val now = System.currentTimeMillis()
-    isomorphicNonStutteringSequences(s).takeWhile(_ => System.currentTimeMillis() - now < maxTimeMillis)
+    println("....")
+    val res: Stream[Seq[Move]] = isomorphicNonStutteringSequences(s).takeWhile(_ => System.currentTimeMillis() - now < maxTimeMillis)
+    println("!!!!")
+    res
   }
 
 }
