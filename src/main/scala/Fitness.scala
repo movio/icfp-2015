@@ -2,50 +2,69 @@
 // BIGGER is always BETTER
 class AggregateDepthFitness(weight: Double) extends Function[Array[Array[Boolean]], Double] {
   override def apply(board: Array[Array[Boolean]]): Double = {
-    board.foldLeft(0d) { (depth, col) ⇒      val firstIdx = col.indexOf(true)
+    val maxDepthScore = board.length * board(0).length.toDouble
+
+    val score = board.foldLeft(0d) { (depth, col) ⇒      val firstIdx = col.indexOf(true)
       if (firstIdx == -1) {
         depth + col.length
       } else {
         depth + firstIdx
       }
-    } * weight
+    }
+    val normalizedScore = score / maxDepthScore
+    normalizedScore * weight
   }
 }
 
 class CompleteLinesFitness(weight: Double) extends Function[Array[Array[Boolean]], Double] {
   override def apply(board: Array[Array[Boolean]]): Double = {
-    board.transpose.foldLeft(0) { (numCleared, row) ⇒      if (row.forall(b => b)) {
-        numCleared + 1      } else {
+    val maxCompleteLines = board(0).length.toDouble
+    val score = board.transpose.foldLeft(0) { (numCleared, row) ⇒
+      if (row.forall(b => b)) {
+        numCleared + 1
+      } else {
         numCleared
       }
-    } * weight
+    }
+    val normalized = score / maxCompleteLines
+    normalized * weight
   }
 }
 
 class HoleFitness(weight: Double) extends Function[Array[Array[Boolean]], Double] {
   override def apply(board: Array[Array[Boolean]]): Double = {
-    board.foldLeft(0) { (count, col) =>
+    val maxHollowness = Math.max((board.length * (board(0).length - 1)), 1).toDouble
+
+    val score = board.foldLeft(0) { (count, col) =>
       val firstCovered = col.indexOf(true)
       if (firstCovered >= 0) {
         col.splitAt(firstCovered)._2.count(_ == false) + count
       } else {
         count
       }
-    } * (-weight)
+    }
+    val normalized = score / maxHollowness
+    normalized * (-weight)
   }
 }
 
 
 class BumpinessFitness(weight: Double) extends Function[Array[Array[Boolean]], Double] {
   override def apply(board: Array[Array[Boolean]]): Double = {
+    val maxBumpiness = Math.max((board.length - 1) * board(0).length, 1).toDouble
+
     if (board.length < 2) {
-      return 0    }
-    board.sliding(2).foldLeft(0) { (count, colWindow) =>
+      return 0
+    }
+
+    val score = board.sliding(2).foldLeft(0) { (count, colWindow) =>
       val List(first,second) = colWindow.toList
       val firstHeight = substituteNegativeForLength(first.indexOf(true), first.length)
       val secondHeight = substituteNegativeForLength(second.indexOf(true), first.length)
       Math.abs(secondHeight - firstHeight) + count
-    } * (-weight)
+    }
+    val normalized = score / maxBumpiness
+    normalized * (-weight)
   }
   private def substituteNegativeForLength(idx:Int, len:Int): Int= {
     if (idx < 0) {
@@ -98,10 +117,6 @@ class SnugnessFitness(weight: Double) extends Function[Array[Array[Boolean]], Do
 
     (neighbourCount / 6.0 / cellCount) * weight
   }
-}
-
-class StackingFitness(weight:Double) extends  Function[Array[Array[Boolean]], Double] {
-  override def apply(board: Array[Array[Boolean]]): Double = 1
 }
 
 class FitnessEvaluator(aggregateWeight: Double, bumpinessWeight: Double,
