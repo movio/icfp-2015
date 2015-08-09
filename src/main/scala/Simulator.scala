@@ -208,9 +208,17 @@ class Simulator(p: Problem, seedIndex: Int) {
     if (!isGameOver) {
       val moves = nextMoves()
 
-      def isValidMove(m: Seq[Move]): Boolean = true
+      def isValidMove(m: Seq[Move]): Boolean = {
+        val positions: Seq[Block] = Seq(current) ++ (1 to m.length).map { case i ⇒
+          m.take(i).foldLeft(current) { (b, move) ⇒ b.move(move) }
+        }
+        !positions.exists(block => isLocationInvalid(block, board))
+      }
 
       val movesWithPowerWords = powerWords.findValidEmbedding(moves, isValidMove)
+//      println(moves)
+//      println(movesWithPowerWords)
+//      readLine()
 
       playAll((movesWithPowerWords map (_.s)).mkString)
 

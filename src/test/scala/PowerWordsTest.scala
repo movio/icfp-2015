@@ -63,7 +63,13 @@ class PowerWordsTest extends FunSpec with ShouldMatchers {
     PowerWords.toMoves("Ia! Ia!") shouldBe Seq(SouthWest, SouthWest, West, SouthEast, SouthWest, SouthWest, West)
     PowerWords.toMoves("r'lyeh") shouldBe Seq(Clock, West, SouthEast, East, East, SouthWest)
     PowerWords.toMoves("cthulu") shouldBe Seq(East, CounterClock, SouthWest, CounterClock, SouthEast, CounterClock)
+    PowerWords.toMoves("davar") shouldBe Seq(Clock, SouthWest, Clock, SouthWest, Clock)
+    PowerWords.toMoves("old ones") shouldBe Seq(SouthEast, SouthEast, Clock, SouthEast, SouthEast, SouthEast, East, CounterClock)
+    PowerWords.toMoves("Lovecraft") shouldBe Seq(SouthEast, SouthEast, Clock, East, East, Clock, SouthWest, East, CounterClock)
+    PowerWords.toMoves("Azathoth") shouldBe Seq(SouthWest, Clock, SouthWest, CounterClock, SouthWest, SouthEast, CounterClock, SouthWest)
+    PowerWords.toMoves("2xjw 4s") shouldBe Seq(East, CounterClock, SouthWest, CounterClock, SouthEast, SouthWest, CounterClock)
   }
+
 
   it("rejects East West pairs") {
     PowerWords.accept("PE") shouldBe false
