@@ -55,6 +55,7 @@ class PowerWordsTest extends FunSpec with ShouldMatchers {
     PowerWords.accept("Aleister") shouldBe true
     PowerWords.accept("Lovecraft") shouldBe true
     PowerWords.accept("Azathoth") shouldBe true
+    PowerWords.accept("2xjw 4s") shouldBe true
   }
 
   it("translates into moves") {

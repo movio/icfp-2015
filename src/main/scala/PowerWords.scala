@@ -59,7 +59,8 @@ case class PowerWords(maxTimeMillis: Int) {
 //    "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
 //    "Cthulhu fhtagn",
     "Lovecraft",
-    "Azathoth"
+    "Azathoth",
+    "2xjw 4s"
   )
 
   val powerMoves: Seq[Seq[Move]] = powerWords map PowerWords.toMoves

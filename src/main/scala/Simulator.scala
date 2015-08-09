@@ -39,10 +39,7 @@ object Moves {
 
   def findINSS(s: Seq[Move], maxTimeMillis: Long): Seq[Seq[Move]] = {
     val now = System.currentTimeMillis()
-    println("....")
-    val res: Stream[Seq[Move]] = isomorphicNonStutteringSequences(s).takeWhile(_ => System.currentTimeMillis() - now < maxTimeMillis)
-    println("!!!!")
-    res
+    isomorphicNonStutteringSequences(s).takeWhile(_ => System.currentTimeMillis() - now < maxTimeMillis)
   }
 
 }
@@ -211,7 +208,11 @@ class Simulator(p: Problem, seedIndex: Int) {
     if (!isGameOver) {
       val moves = nextMoves()
 
-      playAll((moves map (_.s)).mkString)
+      def isValidMove(m: Seq[Move]): Boolean = true
+
+      val movesWithPowerWords = powerWords.findValidEmbedding(moves, isValidMove)
+
+      playAll((movesWithPowerWords map (_.s)).mkString)
 
       // because it must exist, obviously /s
       val m = Move.all.find(move ⇒ isLocationInvalid(current.move(move), board)).get
