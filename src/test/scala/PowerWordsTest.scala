@@ -76,17 +76,34 @@ class PowerWordsTest extends FunSpec with ShouldMatchers {
 
   it("finds valid embeddings") {
 
+    val moves = Seq(East, Clock, SouthWest, Clock, West, West)
+
+    val embeddingsMap: Map[Seq[Move], Seq[Move]] =  Map(
+      Seq(East, Clock) -> Seq(Clock, East),
+      Seq(Clock, West) -> Seq(West, Clock, SouthEast, Clock)
+    )
+
+    def isValidMove: Seq[Move] => Boolean = x => true
+
+    PowerWords.findValidEmbedding(moves, embeddingsMap, isValidMove) shouldBe  List(
+      Clock, East, SouthWest, West, Clock, SouthEast, Clock, West
+    )
+
+  }
+
+  it("finds valid embeddings that don't stutter") {
+
     val moves = Seq(East, Clock, West, Clock, West, West)
 
     val embeddingsMap: Map[Seq[Move], Seq[Move]] =  Map(
       Seq(East, Clock) -> Seq(Clock, East),
-      Seq(Clock, West) -> Seq(West, Clock, CounterClock, Clock)
+      Seq(West, Clock) -> Seq(West, Clock, SouthEast, Clock)
     )
 
     def isValidMove: Seq[Move] => Boolean = x => true
 
     PowerWords.findValidEmbedding(moves, embeddingsMap, isValidMove) shouldBe List(
-      Clock, East, West, West, Clock, CounterClock, Clock, West
+      East, Clock, West, Clock, SouthEast, Clock, West, West
     )
 
   }

@@ -34,7 +34,7 @@ object PowerWords {
           val prefix = current.take(i + pos)
           val suffix = current.drop(i + pos).drop(embedding.length)
           val candidate = prefix ++ powerMove ++ suffix
-          if (isValidMove(candidate)) {
+          if (isValidMove(candidate) && Moves.nonStuttering(candidate)) {
             done = false
             current = candidate
             i = prefix.length + powerMove.length
