@@ -39,10 +39,7 @@ object Moves {
 
   def findINSS(s: Seq[Move], maxTimeMillis: Long): Seq[Seq[Move]] = {
     val now = System.currentTimeMillis()
-    println("....")
-    val res: Stream[Seq[Move]] = isomorphicNonStutteringSequences(s).takeWhile(_ => System.currentTimeMillis() - now < maxTimeMillis)
-    println("!!!!")
-    res
+    isomorphicNonStutteringSequences(s).takeWhile(_ => System.currentTimeMillis() - now < maxTimeMillis)
   }
 
 }
@@ -65,7 +62,7 @@ object Solution {
 
 object Simulator {
 
-  val powerWords = PowerWords(3000)
+  val powerWords = PowerWords(10000)
 
   def calculateSpawnLocation(block: Block, boardWidth: Int): Block = {
     val xs = block.members map (_.x)
@@ -211,7 +208,19 @@ class Simulator(p: Problem, seedIndex: Int, fitnessEvaluator: FitnessEvaluator =
     if (!isGameOver) {
       val moves = nextMoves()
 
-      playAll((moves map (_.s)).mkString)
+      def isValidMove(m: Seq[Move]): Boolean = {
+        val positions: Seq[Block] = Seq(current) ++ (1 to m.length).map { case i ⇒
+          m.take(i).foldLeft(current) { (b, move) ⇒ b.move(move) }
+        }
+        !positions.exists(block => isLocationInvalid(block, board))
+      }
+
+      val movesWithPowerWords = powerWords.findValidEmbedding(moves, isValidMove)
+//      println(moves)
+//      println(movesWithPowerWords)
+//      readLine()
+
+      playAll((movesWithPowerWords map (_.s)).mkString)
 
       // because it must exist, obviously /s
       val m = Move.all.find(move ⇒ isLocationInvalid(current.move(move), board)).get

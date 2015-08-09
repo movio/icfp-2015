@@ -34,7 +34,8 @@ object PowerWords {
           val prefix = current.take(i + pos)
           val suffix = current.drop(i + pos).drop(embedding.length)
           val candidate = prefix ++ powerMove ++ suffix
-          if (isValidMove(candidate)) {
+          if (isValidMove(candidate) && Moves.nonStuttering(candidate)) {
+//            println("using powerMove " + powerMove + " with isomorphism " + embedding)
             done = false
             current = candidate
             i = prefix.length + powerMove.length
@@ -50,7 +51,7 @@ object PowerWords {
 case class PowerWords(maxTimeMillis: Int) {
 
   val powerWords: Seq[String] = Seq(
-    "Ei",
+    "Ei!",
     "Ia! Ia",
     "r'lyeh",
     "cthulu",
@@ -59,14 +60,17 @@ case class PowerWords(maxTimeMillis: Int) {
 //    "Ph'nglui mglw'nafh Cthulhu R'lyeh wgah'nagl fhtagn",
 //    "Cthulhu fhtagn",
     "Lovecraft",
-    "Azathoth"
+    "Azathoth",
+    "2xjw 4s"
   )
 
   val powerMoves: Seq[Seq[Move]] = powerWords map PowerWords.toMoves
 
   val embeddingsMap: Map[Seq[Move], Seq[Move]] = {
     powerMoves flatMap { powerMove: Seq[Move] ⇒
-      Moves.findINSS(powerMove, maxTimeMillis / powerWords.length) map (moves ⇒ moves -> powerMove)
+      val equivalentMoves: Seq[Seq[Move]] = Moves.findINSS(powerMove, maxTimeMillis / powerWords.length)
+      val tuples: Seq[(Seq[Move], Seq[Move])] = equivalentMoves map (moves ⇒ moves -> powerMove)
+      tuples
     }
   }.toMap
 
