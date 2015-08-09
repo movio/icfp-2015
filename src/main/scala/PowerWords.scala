@@ -56,7 +56,7 @@ case class PowerWords(maxTimeMillis: Int) {
     "ei!",
     "ia! ia!",
     "r'lyeh",
-    "cthulu",
+    "cthulhu",
     "davar",
     "old ones",
 //    "ph'nglui mglw'nafh cthulhu r'lyeh wgah'nagl fhtagn",
