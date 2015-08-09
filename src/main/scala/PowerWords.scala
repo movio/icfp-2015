@@ -28,7 +28,7 @@ object PowerWords {
     var current = s(moves)
     while (!done) {
       done = true
-      embeddingsMap foreach { case (embedding, powerWord) =>
+      embeddingsMap.toSeq.sortBy(_._2.length).reverse foreach { case (embedding, powerWord) =>
         val pos = current.drop(i).indexOf(s(embedding))
         if (pos != -1) {
           val prefix = current.take(i + pos)
@@ -53,13 +53,14 @@ object PowerWords {
     "ei!",
     "ia! ia!",
     "r'lyeh",
-    "cthulhu",
-    "davar",
+    "yuggoth"
+//    "cthulhu",
+//    "davar",
 //    "old ones",
 //    "ph'nglui mglw'nafh cthulhu r'lyeh wgah'nagl fhtagn!",
 //    "cthulhu fhtagn",
 //    "lovecraft",
-    "azathoth"
+//    "azathoth"
   )
 }
 

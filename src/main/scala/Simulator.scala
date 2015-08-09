@@ -236,7 +236,7 @@ class Simulator(p: Problem, seedIndex: Int, fitnessEvaluator: FitnessEvaluator =
 
     def placeBlock(): Unit = {
       val moves = nextMoves()
-      moves foreach (c ⇒ play(PowerWords.charToMove(c)))
+      playAll(moves, silent = true)
       // because it must exist, obviously /s
       val m = Move.all.find(move ⇒ isLocationInvalid(current.move(move), board)).get
       play(m)
