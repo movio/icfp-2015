@@ -1,11 +1,42 @@
 import collection.mutable
 import spray.json._
 
-sealed abstract class Move(val s:String)
+sealed abstract class Move(val s: String)
 object Move {
   val all = Seq(SouthEast, SouthWest, East, West, Clock, CounterClock)
   def fromName(s: String): Move =
     all.find(_.s == s).get
+}
+
+object Moves {
+
+  def ofLength(length: Int): Stream[Seq[Move]] =
+    if (length == 0)
+      Stream(Seq())
+     else
+      Moves.ofLength(length - 1) flatMap (seq ⇒ Move.all map (seq :+ _))
+
+  def isomorphic(s1: Seq[Move], s2: Seq[Move]): Boolean = {
+    val b = Block(Set(Point(3, 3)), Point(4, 2))
+    val s1End: Block = s1.foldLeft(b) { (b, move) ⇒ b.move(move) }
+    val s2End: Block = s2.foldLeft(b) { (b, move) ⇒ b.move(move) }
+    s1End == s2End
+  }
+
+  def nonStuttering(s: Seq[Move]): Boolean = {
+    val b = Block(Set(Point(3, 3)), Point(4,2))
+    val positions: Seq[Block] = Seq(b) ++ (1 to s.length).map { case i ⇒
+      s.take(i).foldLeft(b) { (b, move) ⇒ b.move(move) }
+    }
+    positions.size == positions.toSet.size
+  }
+
+  def isomorphicNonStutteringSequencesOfLength(s1: Seq[Move], length: Int): Stream[Seq[Move]] =
+    Moves.ofLength(length) filter (s2 ⇒ Moves.nonStuttering(s2) && Moves.isomorphic(s1, s2))
+
+  def isomorphicNonStutteringSequences(s: Seq[Move]): Stream[Seq[Move]] =
+    Stream.from(1) flatMap (i ⇒ isomorphicNonStutteringSequencesOfLength(s, i))
+
 }
 
 sealed abstract class Rotate(s: String) extends Move(s)
@@ -59,11 +90,9 @@ object Simulator {
         if (current.members contains (Point(x, y))) {
           if (current.pivot.x == x && current.pivot.y == y) "0"
           else "O"
-        }
-        else if (current.pivot.x == x && current.pivot.y == y) "X"
+        } else if (current.pivot.x == x && current.pivot.y == y) "X"
         else " "
-      }
-      else " "
+      } else " "
 
     def drawEvenRow(y: Int): Unit = {
       print("/")
@@ -143,7 +172,7 @@ class Simulator(p: Problem, seedIndex: Int) {
   }
 
   def play(move: Move): Simulator = {
-    if(!isGameOver) {
+    if (!isGameOver) {
       val next = current.move(move)
 
       // error to repeat position
@@ -173,9 +202,8 @@ class Simulator(p: Problem, seedIndex: Int) {
 
       playAll((moves map (_.s)).mkString)
 
-
       // because it must exist, obviously /s
-      val m = Move.all.find(move => isLocationInvalid(current.move(move), board)).get
+      val m = Move.all.find(move ⇒ isLocationInvalid(current.move(move), board)).get
 
       play(m)
       draw()
@@ -191,7 +219,7 @@ class Simulator(p: Problem, seedIndex: Int) {
       val moves = nextMoves()
       moves foreach play
       // because it must exist, obviously /s
-      val m = Move.all.find(move => isLocationInvalid(current.move(move), board)).get
+      val m = Move.all.find(move ⇒ isLocationInvalid(current.move(move), board)).get
       play(m)
 
       commands.append((moves map (_.s)).mkString + m.s)
@@ -221,7 +249,7 @@ class Simulator(p: Problem, seedIndex: Int) {
     }.head
 
   def canBeLockedByOneMove(block: Block): Boolean =
-    Move.all.exists(move => isLocationInvalid(block.move(move), board))
+    Move.all.exists(move ⇒ isLocationInvalid(block.move(move), board))
 
   def lockableCurrentPermutations(): Set[Block] =
     validCurrentPermutations().filter(canBeLockedByOneMove)
@@ -249,7 +277,7 @@ class Simulator(p: Problem, seedIndex: Int) {
         y ← (0 until y).reverse
         x ← 0 until p.width
       } {
-        board(x)(y+1) = board(x)(y)
+        board(x)(y + 1) = board(x)(y)
       }
     }
 
@@ -282,7 +310,7 @@ class Simulator(p: Problem, seedIndex: Int) {
   }
 
   private def lock(): Simulator = {
-    current.members.foreach (point ⇒ board(point.x)(point.y) = true)
+    current.members.foreach(point ⇒ board(point.x)(point.y) = true)
     this
   }
 

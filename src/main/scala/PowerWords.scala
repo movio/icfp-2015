@@ -19,12 +19,6 @@ object PowerWords {
 
   def toMoves(s: String): Seq[Move] = s.toLowerCase map charToMove
 
-  def accept(s: String): Boolean = {
-    val b = Block(Set(Point(3, 3)), Point(4,2))
-    val positions: Seq[Block] = Seq(b) ++ (1 to s.length).map { case i ⇒
-      toMoves(s.substring(0, i)).foldLeft(b) { (b, move) ⇒ b.move(move) }
-    }
-    positions.size == positions.toSet.size
-  }
+  def accept(s: String): Boolean = Moves.nonStuttering(toMoves(s))
 
 }
