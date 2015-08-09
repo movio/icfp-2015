@@ -126,7 +126,7 @@ object Simulator {
   }
 }
 
-class Simulator(p: Problem, seedIndex: Int) {
+class Simulator(p: Problem, seedIndex: Int, fitnessEvaluator: FitnessEvaluator = TotalFitness)  {
   import Simulator._
 
   // TODO optimise this to (y, x) - makes line clearing much easier
@@ -212,6 +212,28 @@ class Simulator(p: Problem, seedIndex: Int) {
     this
   }
 
+  def quietAutoplay() = {
+    if (!isGameOver) {
+      val moves = nextMoves()
+
+      quietPlayAll((moves map (_.s)).mkString)
+
+      // because it must exist, obviously /s
+      val m = Move.all.find(move => isLocationInvalid(current.move(move), board)).get
+
+      play(m)
+    }
+
+    this
+  }
+
+  def quietPlayAll(s: String): Simulator = {
+    val moves = s map (c ⇒ Move.fromName(c.toString))
+    moves.foldLeft(this) { (s, move) ⇒
+      s.play(move)
+    }
+  }
+
   def createSolution(): Solution = {
     val commands = new StringBuilder
 
@@ -241,7 +263,7 @@ class Simulator(p: Problem, seedIndex: Int) {
     lockableCurrentPermutations().toStream.map { block ⇒
       val newBoard = board.map(_.clone())
       block.members.foreach(point ⇒ newBoard(point.x)(point.y) = true)
-      (TotalFitness(newBoard), block)
+      (fitnessEvaluator(newBoard), block)
     }.sortBy(_._1).reverse.flatMap { case (_, target) ⇒
       // current == spawn location
       //Pathfinder.find(board, target, current)
