@@ -62,7 +62,7 @@ object Solution {
 
 object Simulator {
 
-  val powerWords = PowerWords(3000)
+  val powerWords = PowerWords(10000)
 
   def calculateSpawnLocation(block: Block, boardWidth: Int): Block = {
     val xs = block.members map (_.x)
