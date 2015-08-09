@@ -69,33 +69,66 @@ class LineFullnessFitness(weight: Double) extends Function[Array[Array[Boolean]]
   }
 }
 
-class StackingFitness(weight:Double) extends  Function[Array[Array[Boolean]], Double] {
-  override def apply(board: Array[Array[Boolean]]): Double = 1}
+class SnugnessFitness(weight: Double) extends Function[Array[Array[Boolean]], Double] {
 
-class FitnessEvaluator(aggregateWeight: Double, bumpinessWeight: Double, 
-  completeLinesWeight: Double, holesWeight: Double, fullnessWeight: Double) {
+  val even = Seq((-1, -1), (0, -1), (-1, 0), (1, 0), (-1, 1), (0, 1))
+  val odd = Seq((0, -1), (1, -1), (-1, 0), (1, 0), (0, 1), (1, 1))
+
+  override def apply(board: Array[Array[Boolean]]): Double = {
+    val width = board.length
+    val height = board(0).length
+
+    var cellCount = 0
+    var neighbourCount = 0
+
+    for {
+      x ← 0 until width
+      y ← 0 until height
+      (dx, dy) ← if (y % 2 == 0) even else odd
+    } {
+      if (board(x)(y)) {
+        cellCount += 1
+
+        val px = x + dx
+        val py = x + dy
+        if (px < 0 || px >= width || py < 0 || py >= height || board(px)(py))
+          neighbourCount += 1
+      }
+    }
+
+    (neighbourCount / 6.0 / cellCount) * weight
+  }
+}
+
+class StackingFitness(weight:Double) extends  Function[Array[Array[Boolean]], Double] {
+  override def apply(board: Array[Array[Boolean]]): Double = 1
+}
+
+class FitnessEvaluator(aggregateWeight: Double, bumpinessWeight: Double,
+  completeLinesWeight: Double, holesWeight: Double, fullnessWeight: Double,
+  snugnessWeight: Double) {
 
   val depth = new AggregateDepthFitness(aggregateWeight)
   val bumps = new BumpinessFitness(bumpinessWeight)
   val lines = new CompleteLinesFitness(completeLinesWeight)
   val holes = new HoleFitness(holesWeight)
   val fullness = new LineFullnessFitness(fullnessWeight)
+  val snugness = new SnugnessFitness(snugnessWeight)
 
   def apply(board: Array[Array[Boolean]]): Double = {
-    depth(board) + lines(board) + holes(board) + bumps(board) + fullness(board)
+    depth(board) + lines(board) + holes(board) + bumps(board) + fullness(board) + snugness(board)
   }
-  
+
   def printFitnessScores(board: Array[Array[Boolean]]) = {
     println("Depth score: " + depth(board))
     println("Lines score: " + lines(board))
     println("Holes score: " + holes(board))
     println("Bumps score: " + bumps(board))
     println("Fullness score: " + fullness(board))
+    println("Snugness score: " + snugness(board))
   }
 }
 
-object TotalFitness extends FitnessEvaluator(1,100,0.5,1,1) { 
-
-}
+object TotalFitness extends FitnessEvaluator(1,1,1,1,1,1)
 
 
