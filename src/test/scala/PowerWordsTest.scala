@@ -85,16 +85,17 @@ class PowerWordsTest extends FunSpec with ShouldMatchers {
 
     val moves = Seq(East, Clock, SouthWest, Clock, West, West)
 
-    val embeddingsMap: Map[Seq[Move], Seq[Move]] =  Map(
-      Seq(East, Clock) -> Seq(Clock, East),
-      Seq(Clock, West) -> Seq(West, Clock, SouthEast, Clock)
+    val embeddingsMap: Map[Seq[Move], String] =  Map(
+      Seq(East, Clock) -> "qe",
+      Seq(Clock, West) -> "!voq"
     )
 
     def isValidMove: Seq[Move] => Boolean = x => true
 
-    PowerWords.findValidEmbedding(moves, embeddingsMap, isValidMove) shouldBe  List(
-      Clock, East, SouthWest, West, Clock, SouthEast, Clock, West
-    )
+    PowerWords.findValidEmbedding(moves, embeddingsMap, isValidMove) shouldBe "qe" + "a" + "!voq" + "p"
+    //List(
+    //  Clock, East, SouthWest, West, Clock, SouthEast, Clock, West
+    //)
 
   }
 
@@ -102,16 +103,17 @@ class PowerWordsTest extends FunSpec with ShouldMatchers {
 
     val moves = Seq(East, Clock, West, Clock, West, West)
 
-    val embeddingsMap: Map[Seq[Move], Seq[Move]] =  Map(
-      Seq(East, Clock) -> Seq(Clock, East),
-      Seq(West, Clock) -> Seq(West, Clock, SouthEast, Clock)
+    val embeddingsMap: Map[Seq[Move], String] =  Map(
+      Seq(East, Clock) -> "qe",
+      Seq(West, Clock) -> "!voq"
     )
 
     def isValidMove: Seq[Move] => Boolean = x => true
 
-    PowerWords.findValidEmbedding(moves, embeddingsMap, isValidMove) shouldBe List(
-      East, Clock, West, Clock, SouthEast, Clock, West, West
-    )
+    PowerWords.findValidEmbedding(moves, embeddingsMap, isValidMove) shouldBe "bd" + "!voq" + "pp"
+    //List(
+    //  East, Clock, West, Clock, SouthEast, Clock, West, West
+    //)
 
   }
 
