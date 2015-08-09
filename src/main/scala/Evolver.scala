@@ -14,7 +14,7 @@ object Evolver {
       val completeLines = fitteset.getGenes()(2).getAllele.asInstanceOf[Double]
       val holes = fitteset.getGenes()(3).getAllele.asInstanceOf[Double]
       val fullness = fitteset.getGenes()(4).getAllele.asInstanceOf[Double]
-      val snuggness = fitteset.getGenes()(4).getAllele.asInstanceOf[Double]
+      val snuggness = fitteset.getGenes()(5).getAllele.asInstanceOf[Double]
 
       println(s"// Problem $i: Got fittest with score: ${fitteset.getFitnessValue}")
       println(s"// Problem $i: Weight for aggregate: $aggregate")
@@ -22,8 +22,8 @@ object Evolver {
       println(s"// Problem $i: Weight for completeLines: $completeLines")
       println(s"// Problem $i: Weight for holes: $holes")
       println(s"// Problem $i: Weight for fullness: $fullness")
-      println(s"// Problem $i: Weight for snuggness: $fullness")
-      println(s"val evolver_p$i = new FitnessEvaluator($aggregate, $bumpiness, $completeLines, $holes, $fullness, $snuggness)")
+      println(s"// Problem $i: Weight for snuggness: $snuggness")
+      println(s"val evaluator_p$i = new FitnessEvaluator($aggregate, $bumpiness, $completeLines, $holes, $fullness, $snuggness)")
 
 
 
@@ -65,7 +65,6 @@ object FitnessEvolver {
     conf.setPopulationSize(100)
 
     val population = Genotype.randomInitialGenotype( conf );
-    println("starting evolution")
 
     val fitnessMonitor = new FitnessImprovementMonitor(30, 5, 1)
 
