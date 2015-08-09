@@ -214,10 +214,11 @@ class Simulator(p: Problem, seedIndex: Int) {
       val newBoard = board.map(_.clone())
       block.members.foreach(point ⇒ newBoard(point.x)(point.y) = true)
       (TotalFitness(newBoard), block)
-    }.sortBy(_._1).reverse.map { case (_, target) ⇒
+    }.sortBy(_._1).reverse.flatMap { case (_, target) ⇒
       // current == spawn location
-      Pathfinder.find(board, target, current)
-    }.filter(!_.isEmpty).head
+      //Pathfinder.find(board, target, current)
+      Pathfinder.astar(board, target, current)
+    }.head
 
   def canBeLockedByOneMove(block: Block): Boolean =
     Move.all.exists(move => isLocationInvalid(block.move(move), board))
