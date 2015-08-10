@@ -5,6 +5,7 @@ import org.jgap.impl.{WeightedRouletteSelector, DoubleGene, DefaultConfiguration
 
 object Evolver {
   def evolveAll() = {
+    // problem 24 takes too long to run like this
     (0 to 23).par foreach { i =>
       println(s"// Evolving for problem $i")
       val problem = Problems.load(i)
