@@ -54,13 +54,7 @@ object PowerWords {
     "ia! ia!",
     "r'lyeh",
     "yuggoth"
-//    "cthulhu",
-//    "davar",
-//    "old ones",
-//    "ph'nglui mglw'nafh cthulhu r'lyeh wgah'nagl fhtagn!",
-//    "cthulhu fhtagn",
-//    "lovecraft",
-//    "azathoth"
+    //"cthulhu fhtagn!" // can't generate isomorphisms :(
   )
 }
 
