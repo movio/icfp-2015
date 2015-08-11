@@ -36,7 +36,7 @@ Sadly we didn't know our H.P. Lovecraft well enough to figure out that many of t
 As a final note we did spend a lot of time watching the simulator run. So here's a sample run of one of the problems (note the wiggling):
 [[[[[Include a film of our simulator running a short problem]]]]]
 
-All in all, ICFP contests are a lot of fun, but have a unadvertised sleep-depriving effect! It is extremely exciting how fast a team can move with a clean slate (and not having to worry about maintenance). Techwise - if you are thinking about using evolutionary algorithms, do make sure that the fitness function is as fast as possible.
+All in all, ICFP contests are a lot of fun, but have an unadvertised sleep-depriving effect! It is extremely exciting how fast a team can move with a clean slate (and not having to worry about maintenance). Techwise - if you are thinking about using evolutionary algorithms, do make sure that the fitness function is as fast as possible.
 
 Cheerio and watch out for the deep ones!
 
